@@ -5,7 +5,8 @@
   "exports": {
     ".": "./lib/index.mjs",
     "./react": "./lib/react/index.mjs",
-    "./react/*": "./lib/react/*"
+    "./react/*": "./lib/react/*",
+    "./react/**/*": "./lib/react/**/*"
   },
   "dependencies": {
     "@babel/preset-env": "^7.23.9",
