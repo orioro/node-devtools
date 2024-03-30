@@ -29,10 +29,10 @@ export const ROLLUP_CONFIG = {
       extensions: jsExtensions,
       babelHelpers: 'bundled',
     }),
-    // 
+    //
     // Babel does not emit declarations
     // https://github.com/babel/babel/issues/9850
-    // 
+    //
     typescript({
       declaration: true,
       declarationDir: 'dist',
@@ -45,8 +45,10 @@ export const ROLLUP_CONFIG = {
 }
 
 export async function rollupConfig(config = {}) {
-  return {
-    ...ROLLUP_CONFIG,
-    ...config,
-  }
+  return typeof config === 'function'
+    ? config(ROLLUP_CONFIG)
+    : {
+        ...ROLLUP_CONFIG,
+        ...config,
+      }
 }
