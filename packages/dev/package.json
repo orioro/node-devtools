@@ -2,7 +2,7 @@
   "name": "@orioro/dev",
   "packageManager": "yarn@4.0.2",
   "scripts": {
-    "build": "rm -rf dist && rollup --config ./rollup.config.mjs"
+    "build_": "rm -rf dist && rollup --config ./rollup.config.mjs"
   },
   "main": "lib/index.mjs",
   "exports": {
