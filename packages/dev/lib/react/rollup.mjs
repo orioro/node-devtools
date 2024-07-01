@@ -4,6 +4,8 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { babel } from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
 import typescript from '@rollup/plugin-typescript'
+import css from 'rollup-plugin-import-css'
+import json from '@rollup/plugin-json'
 
 const PACKAGE_JSON = JSON.parse(
   readFileSync(join(process.cwd(), 'package.json'), 'utf8'),
@@ -24,6 +26,7 @@ export const ROLLUP_CONFIG = {
     ...Object.keys(PACKAGE_JSON.devDependencies || {}),
   ],
   plugins: [
+    json(),
     babel({
       babelrc: true,
       exclude: 'node_modules/**',
@@ -42,6 +45,9 @@ export const ROLLUP_CONFIG = {
     nodeResolve({
       browser: true,
       extensions: jsExtensions,
+    }),
+    css({
+      output: 'styles.css',
     }),
   ],
 }

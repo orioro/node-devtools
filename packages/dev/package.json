@@ -20,6 +20,7 @@
     "@babel/preset-typescript": "^7.23.3",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
     "@storybook/addon-essentials": "^8.0.0",
@@ -32,6 +33,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rollup": "^4.13.0",
+    "rollup-plugin-import-css": "^3.5.0",
     "storybook": "^8.0.0",
     "styled-components": "^6.1.8",
     "typescript": "^5.3.3"
