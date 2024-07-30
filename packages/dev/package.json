@@ -1,6 +1,7 @@
 {
   "name": "@orioro/dev",
   "packageManager": "yarn@4.0.2",
+  "version": "0.0.0",
   "scripts": {
     "build_": "rm -rf dist && rollup --config ./rollup.config.mjs"
   },
