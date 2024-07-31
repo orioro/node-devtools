@@ -5,6 +5,10 @@
   "scripts": {
     "build_": "rm -rf dist && rollup --config ./rollup.config.mjs"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "ISC",
   "main": "lib/index.mjs",
   "exports": {
     ".": "./lib/index.mjs",
