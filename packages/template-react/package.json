@@ -9,6 +9,13 @@
     ".": "./dist/index.mjs",
     "./*": "./dist/*"
   },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "private"
+  },
+  "license": "ISC",
   "scripts": {
     "build": "rm -rf dist && rollup --config ./rollup.config.mjs",
     "storybook": "storybook dev -p 6006",
