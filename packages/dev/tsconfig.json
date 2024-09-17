@@ -6,6 +6,6 @@
     "allowSyntheticDefaultImports": true,
     "strict": true
   },
-  "include": ["src/**/*.ts", "lib/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.mjs"],
   "exclude": ["**/*.spec.ts", "node_modules"]
 }

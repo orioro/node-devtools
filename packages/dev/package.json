@@ -1,23 +1,35 @@
 {
   "name": "@orioro/dev",
   "packageManager": "yarn@4.0.2",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
-    "build_": "rm -rf dist && rollup --config ./rollup.config.mjs"
+    "build": "rm -rf dist && rollup --config ./rollup.config.mjs"
   },
   "publishConfig": {
     "access": "public"
   },
   "license": "ISC",
-  "main": "lib/index.mjs",
+  "main": "dist/index.mjs",
   "exports": {
-    ".": "./lib/index.mjs",
-    "./react": "./lib/react/index.mjs",
-    "./react/*": "./lib/react/*",
-    "./react/**/*": "./lib/react/**/*",
-    "./ts": "./lib/ts/index.mjs",
-    "./ts/*": "./lib/ts/*",
-    "./ts/**/*": "./lib/ts/**/*"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "import": "./dist/react/index.mjs",
+      "require": "./dist/react/index.cjs"
+    },
+    "./ts": {
+      "import": "./dist/ts/index.mjs",
+      "require": "./dist/ts/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "next": "^14.0.0",
+    "react": "^16.0.0"
   },
   "dependencies": {
     "@babel/preset-env": "^7.23.9",
