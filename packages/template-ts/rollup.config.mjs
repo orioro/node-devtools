@@ -1,4 +1,4 @@
-import { rollupConfig } from '@orioro/dev/ts/rollup.mjs'
+import { rollupConfig } from '@orioro/dev/ts'
 
 export default rollupConfig((base) => ({
   ...base,

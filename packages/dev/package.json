@@ -3,7 +3,7 @@
   "packageManager": "yarn@4.0.2",
   "version": "0.0.1",
   "scripts": {
-    "build": "rm -rf dist && rollup --config ./rollup.config.mjs"
+    "build": "rollup --config ./rollup.config.mjs"
   },
   "publishConfig": {
     "access": "public"

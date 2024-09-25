@@ -1,3 +1,3 @@
-import { rollupConfig } from '@orioro/dev/react/rollup.mjs'
+import { rollupConfig } from '@orioro/dev/react'
 
 export default rollupConfig({})
