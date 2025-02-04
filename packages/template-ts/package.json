@@ -18,10 +18,13 @@
   "license": "ISC",
   "scripts": {
     "build": "rm -rf dist && rollup --config ./rollup.config.mjs",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "npm run build && npm run readme",
+    "readme": "readme"
   },
   "devDependencies": {
     "@orioro/dev": "workspace:*",
+    "@orioro/readme": "^1.0.1",
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
     "rollup": "^4.13.0"

@@ -15,6 +15,11 @@ export const ROLLUP_CONFIG = {
   input: 'src/index.ts',
   output: [
     {
+      file: 'dist/index.js',
+      format: 'cjs',
+      exports: 'named',
+    },
+    {
       file: 'dist/index.mjs',
       format: 'esm',
     },
@@ -38,7 +43,7 @@ export const ROLLUP_CONFIG = {
       declaration: true,
       declarationDir: 'dist',
     }),
-    // commonjs(),
+    commonjs(),
     nodeResolve({
       browser: true,
       extensions: jsExtensions,
