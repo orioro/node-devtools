@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "packageManager": "yarn@4.0.2",
   "scripts": {
-    "build": "yarn workspaces foreach --all --parallel --interlaced --topological-dev run build"
+    "build_": "yarn workspaces foreach --all --parallel --interlaced --topological-dev run build"
   },
   "workspaces": [
     "packages/*"
