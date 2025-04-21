@@ -22,7 +22,7 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
-    "@orioro/dev": "workspace:*",
+    "@orioro/dev": "workspace:^",
     "rollup": "^4.13.0",
     "storybook": "^8.0.0"
   },
