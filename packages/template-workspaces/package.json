@@ -1,7 +1,7 @@
 {
   "name": "template-workspaces",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "yarn@4.0.2",
   "scripts": {
     "changeset": "changeset",
