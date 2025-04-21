@@ -1,18 +1,20 @@
 {
   "name": "template-workspaces",
+  "private": true,
   "version": "0.1.0",
   "packageManager": "yarn@4.0.2",
   "scripts": {
+    "changeset": "changeset",
     "build_": "yarn workspaces foreach --all --parallel --interlaced --topological-dev run build"
   },
   "workspaces": [
     "packages/*"
   ],
-  "private": true,
   "engines": {
     "node": "20.x"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.2",
     "prettier": "^3.5.2"
   }
 }
