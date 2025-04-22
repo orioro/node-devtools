@@ -21,6 +21,10 @@ export const ROLLUP_CONFIG = {
       format: 'esm',
     },
   ],
+
+  // TODO: study replacing external to use node_modules regexp
+  // external: /node_modules/,
+
   external: [
     ...Object.keys(PACKAGE_JSON.dependencies || {}),
     ...Object.keys(PACKAGE_JSON.devDependencies || {}),

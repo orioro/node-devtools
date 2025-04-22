@@ -19,7 +19,7 @@
   "license": "ISC",
   "scripts": {
     "build": "rm -rf dist && rollup --config ./rollup.config.mjs",
-    "storybook": "storybook dev -p 6006",
+    "dev": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "devDependencies": {
