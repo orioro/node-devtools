@@ -1,5 +1,11 @@
 # template-workspaces
 
+## 0.1.2
+
+### Patch Changes
+
+- fix changeset release with yarn
+
 ## 0.1.1
 
 ### Patch Changes

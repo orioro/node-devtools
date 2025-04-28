@@ -1,5 +1,11 @@
 # @orioro/template-ts
 
+## 0.0.2
+
+### Patch Changes
+
+- fix changeset release with yarn
+
 ## 0.0.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @orioro/dev
 
+## 0.0.5
+
+### Patch Changes
+
+- fix changeset release with yarn
+
 ## 0.0.4
 
 ### Patch Changes
