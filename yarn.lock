@@ -3712,6 +3712,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/degit@npm:^2.8.6":
+  version: 2.8.6
+  resolution: "@types/degit@npm:2.8.6"
+  checksum: b1860d95e1590a6de41b8a9f5bfb4ec531f8e31db9cb0b4b81db548a35a93a46e3e8f784c333f2950515a431fdb8435b686b97169a80a12d50d11a389401cbc6
+  languageName: node
+  linkType: hard
+
 "@types/doctrine@npm:^0.0.9":
   version: 0.0.9
   resolution: "@types/doctrine@npm:0.0.9"
@@ -5689,6 +5696,7 @@ __metadata:
     "@clack/prompts": "npm:^1.2.0"
     "@orioro/dev": "workspace:^"
     "@orioro/readme": "npm:^1.0.1"
+    "@types/degit": "npm:^2.8.6"
     "@types/jest": "npm:^29.5.12"
     babel-jest: "npm:^30.3.0"
     commander: "npm:^14.0.3"

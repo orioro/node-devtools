@@ -5,7 +5,9 @@
   "type": "module",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "bin": "./dist/cli.mjs",
+  "bin": {
+    "create-orioro": "./dist/cli.mjs"
+  },
   "exports": {
     ".": "./dist/index.mjs",
     "./*": "./dist/*"
@@ -34,6 +36,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^1.2.0",
+    "@types/degit": "^2.8.6",
     "commander": "^14.0.3",
     "degit": "^2.8.4"
   }
