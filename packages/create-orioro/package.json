@@ -5,9 +5,7 @@
   "type": "module",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "bin": {
-    "create-orioro": "dist/cli.mjs"
-  },
+  "bin": "dist/cli.mjs",
   "exports": {
     ".": "./dist/index.mjs",
     "./*": "./dist/*"

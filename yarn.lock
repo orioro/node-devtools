@@ -2756,6 +2756,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@orioro/readme@npm:^2.0.0, @orioro/readme@workspace:packages/readme":
+  version: 0.0.0-use.local
+  resolution: "@orioro/readme@workspace:packages/readme"
+  dependencies:
+    "@orioro/dev": "workspace:^"
+    "@prettier/sync": "npm:^0.6.1"
+    "@types/jest": "npm:^29.5.12"
+    babel-jest: "npm:^30.3.0"
+    fast-glob: "npm:^3.3.3"
+    jest: "npm:^29.7.0"
+    prettier: "npm:^3.8.1"
+    rollup: "npm:^4.13.0"
+    typescript: "npm:^6.0.2"
+  bin:
+    readme: ./dist/cli.mjs
+  languageName: unknown
+  linkType: soft
+
 "@orioro/template-react@workspace:packages/template-react":
   version: 0.0.0-use.local
   resolution: "@orioro/template-react@workspace:packages/template-react"
@@ -2779,7 +2797,7 @@ __metadata:
   resolution: "@orioro/template-ts@workspace:packages/template-ts"
   dependencies:
     "@orioro/dev": "workspace:^"
-    "@orioro/readme": "npm:^1.0.1"
+    "@orioro/readme": "npm:^2.0.0"
     "@types/jest": "npm:^29.5.12"
     babel-jest: "npm:^30.3.0"
     jest: "npm:^29.7.0"
@@ -2821,6 +2839,17 @@ __metadata:
     webpack-plugin-serve:
       optional: true
   checksum: afe7d5d5895f2edc1f4336e57082072736a27d79389eabc6c4e1297dae08da06e01d17f1b3866ed871989e070dbc3ec14ad8a1a88a22b11c1c530db5aa67fa12
+  languageName: node
+  linkType: hard
+
+"@prettier/sync@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "@prettier/sync@npm:0.6.1"
+  dependencies:
+    make-synchronized: "npm:^0.8.0"
+  peerDependencies:
+    prettier: "*"
+  checksum: 4cf6dd8c27f6425924ac749ca980693b447d39162b530e103f4613df470c1ec877f691d10796556b748ce8c954cc76e0f2a73e18e02b125d295168012c25df71
   languageName: node
   linkType: hard
 
@@ -5704,7 +5733,7 @@ __metadata:
     jest: "npm:^29.7.0"
     rollup: "npm:^4.13.0"
   bin:
-    create-orioro: ./dist/cli.mjs
+    create-orioro: dist/cli.mjs
   languageName: unknown
   linkType: soft
 
@@ -6590,7 +6619,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.9":
+"fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.3":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
@@ -8975,6 +9004,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"make-synchronized@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "make-synchronized@npm:0.8.0"
+  checksum: b8293d79e8752840a8103034866296b781c754286bf54864f4014b01f4b46710c5eaa04ffdabd7167513a4e72e7fec4396b36fb5aef16222fd5a268d1b4c041e
+  languageName: node
+  linkType: hard
+
 "makeerror@npm:1.0.12":
   version: 1.0.12
   resolution: "makeerror@npm:1.0.12"
@@ -10139,7 +10175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.5.2":
+"prettier@npm:^3.5.2, prettier@npm:^3.8.1":
   version: 3.8.1
   resolution: "prettier@npm:3.8.1"
   bin:
@@ -12001,6 +12037,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "typescript@npm:6.0.2"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 4b860b0bf87cc0fee0f66d8ef2640b5a8a8a8c74d1129adb82e389e5f97124383823c47946bef8a73ede371461143a3aa8544399d2133c7b2e4f07e81860af7f
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=e012d7"
@@ -12008,6 +12054,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 6f7e53bf0d9702350deeb6f35e08b69cbc8b958c33e0ec77bdc0ad6a6c8e280f3959dcbfde6f5b0848bece57810696489deaaa53d75de3578ff255d168c1efbd
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A^6.0.2#optional!builtin<compat/typescript>":
+  version: 6.0.2
+  resolution: "typescript@patch:typescript@npm%3A6.0.2#optional!builtin<compat/typescript>::version=6.0.2&hash=e012d7"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 4c3eccf92033332f7ec412d762d5049de77b76d78faa26468bc3ad869b3e53d0e70540bf32653e4380adf537f1d716ac0fa50839864bf9e5ee406843a2c936a4
   languageName: node
   linkType: hard
 

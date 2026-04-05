@@ -1,0 +1,204 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renderDocs renders basic function 1`] = `
+"**API:** [\`add\`](#add)
+
+## API
+
+### \`add\` — [source](src/__fixtures__/basic.ts#L10)
+
+\`\`\`ts
+function add(a: number, b: number): number
+\`\`\`
+
+Adds two numbers together.
+
+**Parameters**
+
+- \`a\` — \`number\` - first number
+- \`b\` — \`number\` - second number
+
+**Returns** \`number\` — the sum
+
+**Example**
+
+\`\`\`ts
+add(1, 2) // 3
+\`\`\`
+"
+`;
+
+exports[`renderDocs renders complex types, arrow functions, and classes 1`] = `
+"**API:** [\`fetchUser\`](#fetchuser) · [\`greet\`](#greet) · [\`Greeter\`](#greeter)
+
+**Types:** [\`Result\`](#result)
+
+## API
+
+### \`fetchUser\` — [source](src/__fixtures__/complex.ts#L10)
+
+\`\`\`ts
+function fetchUser(
+  id: string,
+  options?:
+    | { timeout?: number | undefined; retries?: number | undefined }
+    | undefined,
+): Promise<Result<{ id: string; name: string }>>
+\`\`\`
+
+Fetches a user by id.
+
+**Parameters**
+
+- \`id\` — \`string\` - user identifier
+- \`options\` _(optional)_ — \`{ timeout?: number | undefined; retries?: number | undefined; } | undefined\` - request options
+
+**Returns** \`Promise<Result<{ id: string; name: string; }>>\` — resolved user result
+
+### \`greet\` — [source](src/__fixtures__/complex.ts#L22)
+
+\`\`\`ts
+function greet(name: string): string
+\`\`\`
+
+**Parameters**
+
+- \`name\` — \`string\`
+
+**Returns** \`string\`
+
+### \`Greeter\` — [source](src/__fixtures__/complex.ts#L28)
+
+\`\`\`ts
+class Greeter
+\`\`\`
+
+A simple class.
+
+
+## Types
+
+### \`Result\` — [source](src/__fixtures__/complex.ts#L1)
+
+\`\`\`ts
+type Result<T> = { data: T; error: null } | { data: null; error: string }
+\`\`\`
+"
+`;
+
+exports[`renderDocs renders constants with inferred and annotated types 1`] = `
+"**API:** [\`VERSION\`](#version) · [\`MAX_RETRIES\`](#maxretries) · [\`DEFAULT_CONFIG\`](#defaultconfig) · [\`DEFAULT_LOG_LEVEL\`](#defaultloglevel)
+
+**Types:** [\`LogLevel\`](#loglevel)
+
+## API
+
+### \`VERSION\` — [source](src/__fixtures__/constants.ts#L7)
+
+\`\`\`ts
+const VERSION: '1.0.0'
+\`\`\`
+
+Current package version.
+
+### \`MAX_RETRIES\` — [source](src/__fixtures__/constants.ts#L13)
+
+\`\`\`ts
+const MAX_RETRIES: 3
+\`\`\`
+
+Maximum number of retries before giving up.
+
+### \`DEFAULT_CONFIG\` — [source](src/__fixtures__/constants.ts#L19)
+
+\`\`\`ts
+const DEFAULT_CONFIG: { timeout: number; retries: number; verbose: boolean }
+\`\`\`
+
+Default request configuration.
+
+### \`DEFAULT_LOG_LEVEL\` — [source](src/__fixtures__/constants.ts#L29)
+
+\`\`\`ts
+const DEFAULT_LOG_LEVEL: LogLevel
+\`\`\`
+
+Default log level. Type inferred from explicit annotation.
+
+
+## Types
+
+### \`LogLevel\` — [source](src/__fixtures__/constants.ts#L1)
+
+\`\`\`ts
+type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+\`\`\`
+"
+`;
+
+exports[`renderDocs renders type definitions section before API for locally-defined types 1`] = `
+"**API:** [\`findUser\`](#finduser) · [\`updateUser\`](#updateuser)
+
+**Types:** [\`Status\`](#status) · [\`Address\`](#address) · [\`UserProfile\`](#userprofile)
+
+## API
+
+### \`findUser\` — [source](src/__fixtures__/typed.ts#L21)
+
+\`\`\`ts
+function findUser(id: string): UserProfile | null
+\`\`\`
+
+Finds a user by id.
+
+**Parameters**
+
+- \`id\` — \`string\` - user identifier
+
+**Returns** \`UserProfile | null\` — the matching user profile, or null if not found
+
+### \`updateUser\` — [source](src/__fixtures__/typed.ts#L31)
+
+\`\`\`ts
+function updateUser(id: string, patch: Partial<UserProfile>): UserProfile
+\`\`\`
+
+Updates a user's profile fields.
+
+**Parameters**
+
+- \`id\` — \`string\` - user identifier
+- \`patch\` — \`Partial<UserProfile>\` - fields to update
+
+**Returns** \`UserProfile\`
+
+
+## Types
+
+### \`Status\` — [source](src/__fixtures__/typed.ts#L1)
+
+\`\`\`ts
+type Status = 'active' | 'inactive' | 'pending'
+\`\`\`
+
+### \`Address\` — [source](src/__fixtures__/typed.ts#L3)
+
+\`\`\`ts
+type Address = {
+  street: string
+  city: string
+}
+\`\`\`
+
+### \`UserProfile\` — [source](src/__fixtures__/typed.ts#L8)
+
+\`\`\`ts
+type UserProfile = {
+  id: string
+  name: string
+  status: Status
+  address: Address
+}
+\`\`\`
+"
+`;

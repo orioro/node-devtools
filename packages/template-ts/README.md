@@ -1,10 +1,32 @@
-# @orioro/jest-util
+# package-name
+
+Short description of what this package does.
 
 ```
-npm install @orioro/jest-util
-yarn add @orioro/jest-util
+npm install package-name
+yarn add package-name
 ```
 
-Set of utility methods for generating tests using `jest`.
+## Usage
 
-# API Docs
+```ts
+import { someFn } from 'package-name'
+
+someFn('world')
+```
+
+**API:** [`someFn`](#somefn)
+
+## API
+
+### `someFn`
+
+```ts
+function someFn(a: string): string
+```
+
+**Parameters**
+
+- `a` — `string`
+
+**Returns** `string`

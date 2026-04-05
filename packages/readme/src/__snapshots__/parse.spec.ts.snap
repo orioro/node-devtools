@@ -1,0 +1,239 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parsePublicApi collects referenced local type definitions in dependency order 1`] = `
+{
+  "entries": [
+    {
+      "description": "Finds a user by id.",
+      "examples": [],
+      "kind": "function",
+      "line": 21,
+      "name": "findUser",
+      "params": [
+        {
+          "description": "- user identifier",
+          "name": "id",
+          "optional": false,
+          "type": "string",
+        },
+      ],
+      "returnDescription": "the matching user profile, or null if not found",
+      "returnType": "UserProfile | null",
+      "signature": "function findUser(id: string): UserProfile | null",
+    },
+    {
+      "description": "Updates a user's profile fields.",
+      "examples": [],
+      "kind": "function",
+      "line": 31,
+      "name": "updateUser",
+      "params": [
+        {
+          "description": "- user identifier",
+          "name": "id",
+          "optional": false,
+          "type": "string",
+        },
+        {
+          "description": "- fields to update",
+          "name": "patch",
+          "optional": false,
+          "type": "Partial<UserProfile>",
+        },
+      ],
+      "returnDescription": "",
+      "returnType": "UserProfile",
+      "signature": "function updateUser(id: string, patch: Partial<UserProfile>): UserProfile",
+    },
+  ],
+  "types": [
+    {
+      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/typed.ts",
+      "line": 1,
+      "name": "Status",
+      "text": "type Status = 'active' | 'inactive' | 'pending'",
+    },
+    {
+      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/typed.ts",
+      "line": 3,
+      "name": "Address",
+      "text": "type Address = {
+  street: string
+  city: string
+}",
+    },
+    {
+      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/typed.ts",
+      "line": 8,
+      "name": "UserProfile",
+      "text": "type UserProfile = {
+  id: string
+  name: string
+  status: Status
+  address: Address
+}",
+    },
+  ],
+}
+`;
+
+exports[`parsePublicApi infers constant types, including from explicit annotations 1`] = `
+{
+  "entries": [
+    {
+      "description": "Current package version.",
+      "examples": [],
+      "kind": "constant",
+      "line": 7,
+      "name": "VERSION",
+      "params": [],
+      "returnDescription": "",
+      "returnType": "",
+      "signature": "const VERSION: "1.0.0"",
+    },
+    {
+      "description": "Maximum number of retries before giving up.",
+      "examples": [],
+      "kind": "constant",
+      "line": 13,
+      "name": "MAX_RETRIES",
+      "params": [],
+      "returnDescription": "",
+      "returnType": "",
+      "signature": "const MAX_RETRIES: 3",
+    },
+    {
+      "description": "Default request configuration.",
+      "examples": [],
+      "kind": "constant",
+      "line": 19,
+      "name": "DEFAULT_CONFIG",
+      "params": [],
+      "returnDescription": "",
+      "returnType": "",
+      "signature": "const DEFAULT_CONFIG: { timeout: number; retries: number; verbose: boolean; }",
+    },
+    {
+      "description": "Default log level. Type inferred from explicit annotation.",
+      "examples": [],
+      "kind": "constant",
+      "line": 29,
+      "name": "DEFAULT_LOG_LEVEL",
+      "params": [],
+      "returnDescription": "",
+      "returnType": "",
+      "signature": "const DEFAULT_LOG_LEVEL: LogLevel",
+    },
+  ],
+  "types": [
+    {
+      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/constants.ts",
+      "line": 1,
+      "name": "LogLevel",
+      "text": "type LogLevel = 'debug' | 'info' | 'warn' | 'error'",
+    },
+  ],
+}
+`;
+
+exports[`parsePublicApi picks up @public functions and ignores the rest 1`] = `
+{
+  "entries": [
+    {
+      "description": "Adds two numbers together.",
+      "examples": [
+        "add(1, 2) // 3",
+      ],
+      "kind": "function",
+      "line": 10,
+      "name": "add",
+      "params": [
+        {
+          "description": "- first number",
+          "name": "a",
+          "optional": false,
+          "type": "number",
+        },
+        {
+          "description": "- second number",
+          "name": "b",
+          "optional": false,
+          "type": "number",
+        },
+      ],
+      "returnDescription": "the sum",
+      "returnType": "number",
+      "signature": "function add(a: number, b: number): number",
+    },
+  ],
+  "types": [],
+}
+`;
+
+exports[`parsePublicApi resolves complex return types and optional params 1`] = `
+{
+  "entries": [
+    {
+      "description": "Fetches a user by id.",
+      "examples": [],
+      "kind": "function",
+      "line": 10,
+      "name": "fetchUser",
+      "params": [
+        {
+          "description": "- user identifier",
+          "name": "id",
+          "optional": false,
+          "type": "string",
+        },
+        {
+          "description": "- request options",
+          "name": "options",
+          "optional": true,
+          "type": "{ timeout?: number | undefined; retries?: number | undefined; } | undefined",
+        },
+      ],
+      "returnDescription": "resolved user result",
+      "returnType": "Promise<Result<{ id: string; name: string; }>>",
+      "signature": "function fetchUser(id: string, options?: { timeout?: number | undefined; retries?: number | undefined; } | undefined): Promise<Result<{ id: string; name: string; }>>",
+    },
+    {
+      "description": "",
+      "examples": [],
+      "kind": "function",
+      "line": 22,
+      "name": "greet",
+      "params": [
+        {
+          "description": "",
+          "name": "name",
+          "optional": false,
+          "type": "string",
+        },
+      ],
+      "returnDescription": "",
+      "returnType": "string",
+      "signature": "function greet(name: string): string",
+    },
+    {
+      "description": "A simple class.",
+      "examples": [],
+      "kind": "class",
+      "line": 28,
+      "name": "Greeter",
+      "params": [],
+      "returnDescription": "",
+      "returnType": "",
+      "signature": "class Greeter",
+    },
+  ],
+  "types": [
+    {
+      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/complex.ts",
+      "line": 1,
+      "name": "Result",
+      "text": "type Result<T> = { data: T; error: null } | { data: null; error: string }",
+    },
+  ],
+}
+`;
