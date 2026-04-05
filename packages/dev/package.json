@@ -3,6 +3,7 @@
   "packageManager": "yarn@4.0.2",
   "version": "0.0.6",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "rollup --config ./rollup.config.mjs"
   },
   "publishConfig": {

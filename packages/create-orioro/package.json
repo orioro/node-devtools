@@ -1,11 +1,11 @@
 {
-  "name": "@orioro/template-ts",
-  "private": true,
-  "version": "0.0.3",
+  "name": "create-orioro",
+  "version": "0.0.0",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "bin": "./dist/cli.mjs",
   "exports": {
     ".": "./dist/index.mjs",
     "./*": "./dist/*"
@@ -14,14 +14,15 @@
     "dist"
   ],
   "publishConfig": {
-    "access": "private"
+    "access": "public"
   },
   "license": "ISC",
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rm -rf dist && rollup --config ./rollup.config.mjs",
+    "build": "rm -rf dist && rollup --config ./rollup.config.mjs && chmod +x dist/cli.mjs",
     "test": "jest",
-    "readme": "readme"
+    "readme": "readme",
+    "dev:run": "yarn build && node dist/cli.mjs"
   },
   "devDependencies": {
     "@orioro/dev": "workspace:^",
@@ -30,5 +31,10 @@
     "babel-jest": "^30.3.0",
     "jest": "^29.7.0",
     "rollup": "^4.13.0"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.2.0",
+    "commander": "^14.0.3",
+    "degit": "^2.8.4"
   }
 }
