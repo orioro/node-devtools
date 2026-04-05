@@ -6,7 +6,7 @@ export type ComponentProps = {
   bg: string
 }
 
-export const Component: React.FC<ComponentProps> = styled.div`
+export const Component: React.FC<ComponentProps> = styled.input`
   padding: 10px;
 
   background-color: ${({ bg }) => bg};

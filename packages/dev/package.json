@@ -28,8 +28,9 @@
     "dist"
   ],
   "peerDependencies": {
-    "next": "^14.0.0",
-    "react": "^16.0.0"
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "dependencies": {
     "@babel/preset-env": "^7.23.9",
@@ -42,17 +43,15 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@storybook/addon-essentials": "^8.0.0",
     "@storybook/addon-interactions": "^8.0.0",
-    "@storybook/addon-links": "^8.0.0",
-    "@storybook/blocks": "^8.0.0",
     "@storybook/nextjs": "^8.0.0",
-    "@storybook/react": "^8.0.0",
     "@storybook/test": "^8.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "rollup": "^4.13.0",
     "rollup-plugin-import-css": "^3.5.0",
     "storybook": "^8.0.0",
-    "styled-components": "^6.1.8",
-    "typescript": "^5.3.3"
-  }
+    "typescript": "^5.3.3",
+    "webpack": "5.101.2"
+  },
+  "_comments": [
+    "webpack must be pinned to 5.101.2 for storybook compat. see: https://github.com/storybookjs/storybook/issues/32301 AND https://github.com/storybookjs/storybook/pull/32306"
+  ]
 }
