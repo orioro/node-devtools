@@ -1,5 +1,11 @@
 # @orioro/template-ts
 
+## 0.0.3
+
+### Patch Changes
+
+- isolate dev packages
+
 ## 0.0.2
 
 ### Patch Changes

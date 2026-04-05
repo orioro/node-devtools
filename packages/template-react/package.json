@@ -1,7 +1,7 @@
 {
   "name": "@orioro/template-react",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "main": "dist/index.mjs",
