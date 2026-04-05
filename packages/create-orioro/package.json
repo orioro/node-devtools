@@ -1,12 +1,12 @@
 {
   "name": "create-orioro",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "bin": {
-    "create-orioro": "./dist/cli.mjs"
+    "create-orioro": "dist/cli.mjs"
   },
   "exports": {
     ".": "./dist/index.mjs",
@@ -20,7 +20,7 @@
   },
   "license": "ISC",
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublish": "npm run build",
     "build": "rm -rf dist && rollup --config ./rollup.config.mjs && chmod +x dist/cli.mjs",
     "test": "jest",
     "readme": "readme",

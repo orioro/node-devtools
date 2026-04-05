@@ -113,6 +113,7 @@ program
         await scaffold(absProjectDir, templateUrl)
         spinner.stop('Done!')
         prompts.outro(`Project ready at ${absProjectDir}`)
+        process.exit(0)
       } catch (err) {
         spinner.stop('Failed')
         prompts.cancel(err instanceof Error ? err.message : String(err))

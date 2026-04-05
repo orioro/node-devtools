@@ -18,7 +18,7 @@
   },
   "license": "ISC",
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublish": "npm run build",
     "build": "rm -rf dist && rollup --config ./rollup.config.mjs",
     "dev": "storybook dev -p 6006",
     "build-storybook": "storybook build"
