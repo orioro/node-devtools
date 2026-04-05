@@ -5,6 +5,6 @@ export default {
   },
   transformIgnorePatterns: [
     // Ignore all node_modules except those that need transpiling
-    'node_modules/(?!(dot-prop|@orioro/util)/)'
+    // 'node_modules/(?!(dot-prop|@orioro/util)/)'
   ]
 }

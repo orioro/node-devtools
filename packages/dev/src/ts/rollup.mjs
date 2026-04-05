@@ -29,6 +29,10 @@ export const ROLLUP_CONFIG = {
     ...Object.keys(PACKAGE_JSON.devDependencies || {}),
   ],
   plugins: [
+    //
+    // Prefer configuring Babel presets/plugins in babel.config.cjs rather than here.
+    // This config is picked up by both Rollup (via babelrc: true) and Jest automatically.
+    //
     babel({
       babelrc: true,
       exclude: 'node_modules/**',
