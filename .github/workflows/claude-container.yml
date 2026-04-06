@@ -1,0 +1,46 @@
+name: Publish claude-container
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/claude-container/**'
+    tags:
+      - 'claude-container/v*'  # example: claude-container/v0.0.1
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/claude-container/v}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: packages/claude-container
+          push: true
+          tags: |
+            ghcr.io/orioro/claude-container:latest
+            ghcr.io/orioro/claude-container:${{ github.sha }}
+            ${{ steps.version.outputs.version && format('ghcr.io/orioro/claude-container:{0}', steps.version.outputs.version) || '' }}
