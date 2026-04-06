@@ -7,7 +7,8 @@
     "changeset": "changeset",
     "?publish": "changeset does not support yarn@3+. Track: https://github.com/changesets/changesets/issues/432",
     "publish": "yarn workspaces foreach --no-private --all npm publish",
-    "build": "yarn workspaces foreach --all --parallel --interlaced --topological-dev run build"
+    "build": "yarn workspaces foreach --all --parallel --interlaced --topological-dev run build",
+    "claude": "docker compose -f ./packages/template-docker-compose/docker-compose.yml --profile claude up -d && docker exec -it $(docker ps --filter name=claude --format \"{{.Names}}\" | grep -v firewall | head -n 1) zsh"
   },
   "workspaces": [
     "packages/*"
