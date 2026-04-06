@@ -1,0 +1,39 @@
+services:
+  # Main Claude Code container - runs as non-root 'node' user with no network capabilities
+  claude:
+    profiles: [claude]
+    image: ghcr.io/orioro/claude-container:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-claude
+    stdin_open: true
+    tty: true
+    # Uncomment to authenticate via API key instead of claude login
+    # environment:
+    #   - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    #   - TZ=${TZ}
+    volumes:
+      # Claude credentials and config - shared from host so login persists across container restarts
+      - ~/.claude:/home/node/.claude
+      - ~/.claude.json:/home/node/.claude.json
+      - claude_command_history:/commandhistory
+
+      # Your project code - set CLAUDE_CODE_PROJECT_PATH in .env to point to your project
+      - ${CLAUDE_CODE_PROJECT_PATH:?Please set CLAUDE_CODE_PROJECT_PATH in your .env file}:/workspace
+    working_dir: /workspace
+
+  # One-shot container that applies firewall rules to claude's network namespace, then exits.
+  # Runs with NET_ADMIN capability so it can configure iptables, while claude itself has no
+  # network capabilities and cannot modify the rules.
+  claude-firewall:
+    profiles: [claude]
+    image: ghcr.io/orioro/claude-container:latest
+    network_mode: 'container:${COMPOSE_PROJECT_NAME}-claude'
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "sudo /usr/local/bin/init-firewall.sh"
+    depends_on:
+      - claude
+
+volumes:
+  # Persistent shell history across container restarts
+  claude_command_history:

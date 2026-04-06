@@ -16,17 +16,18 @@ const TEMPLATES: Record<string, { label: string; src: string; url?: string }> =
     ts: {
       label: 'TypeScript library (ts)',
       src: `${GITHUB_REPO}/packages/template-ts#${TEMPLATE_BRANCH}`,
-      // url: `https://github.com/${GITHUB_REPO}/tree/${TEMPLATE_BRANCH}/packages/template-ts`,
     },
     react: {
       label: 'React component library (react)',
       src: `${GITHUB_REPO}/packages/template-react#${TEMPLATE_BRANCH}`,
-      // url: `https://github.com/${GITHUB_REPO}/tree/${TEMPLATE_BRANCH}/packages/template-react`,
     },
     workspaces: {
       label: 'Monorepo workspaces (workspaces)',
       src: `${GITHUB_REPO}/packages/template-workspaces#${TEMPLATE_BRANCH}`,
-      // url: `https://github.com/${GITHUB_REPO}/tree/${TEMPLATE_BRANCH}/packages/template-workspaces`,
+    },
+    'docker-compose': {
+      label: 'Docker compose (docker-compose)',
+      src: `${GITHUB_REPO}/packages/template-docker-compose#${TEMPLATE_BRANCH}`,
     },
   }
 
