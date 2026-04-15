@@ -130,13 +130,14 @@ function walkTypeRefs(
   sourceFileNames: Set<string>,
   seen: Set<ts.Symbol>,
   result: TypeDefinition[],
+  visitedTypes: Set<ts.Type>,
 ) {
   if (ts.isTypeReferenceNode(node)) {
     const type = checker.getTypeAtLocation(node)
-    collectTypeDefs(type, checker, sourceFileNames, seen, result)
+    collectTypeDefs(type, checker, sourceFileNames, seen, result, visitedTypes)
   }
   ts.forEachChild(node, (child) =>
-    walkTypeRefs(child, checker, sourceFileNames, seen, result),
+    walkTypeRefs(child, checker, sourceFileNames, seen, result, visitedTypes),
   )
 }
 
@@ -146,7 +147,11 @@ function collectTypeDefs(
   sourceFileNames: Set<string>,
   seen: Set<ts.Symbol>,
   result: TypeDefinition[],
+  visitedTypes: Set<ts.Type>,
 ) {
+  if (visitedTypes.has(type)) return
+  visitedTypes.add(type)
+
   // Prefer aliasSymbol (captures `type Foo = ...`) over structural symbol
   const symbol = type.aliasSymbol ?? type.symbol
 
@@ -164,7 +169,7 @@ function collectTypeDefs(
 
     if (localDecl) {
       // Recurse into this declaration first → dependencies output before dependents
-      walkTypeRefs(localDecl, checker, sourceFileNames, seen, result)
+      walkTypeRefs(localDecl, checker, sourceFileNames, seen, result, visitedTypes)
 
       result.push({
         name: symbol.getName(),
@@ -183,12 +188,12 @@ function collectTypeDefs(
     type.aliasTypeArguments
 
   for (const arg of typeArgs ?? []) {
-    collectTypeDefs(arg, checker, sourceFileNames, seen, result)
+    collectTypeDefs(arg, checker, sourceFileNames, seen, result, visitedTypes)
   }
 
   if (type.isUnion() || type.isIntersection()) {
     for (const t of type.types) {
-      collectTypeDefs(t, checker, sourceFileNames, seen, result)
+      collectTypeDefs(t, checker, sourceFileNames, seen, result, visitedTypes)
     }
   }
 }
@@ -374,11 +379,12 @@ export function parsePublicApi(
 
   // Collect referenced local type definitions from all entry types
   const seen = new Set<ts.Symbol>()
+  const visitedTypes = new Set<ts.Type>()
   const types: TypeDefinition[] = []
 
   for (const { rawTypes } of rawEntries) {
     for (const type of rawTypes) {
-      collectTypeDefs(type, checker, sourceFileNames, seen, types)
+      collectTypeDefs(type, checker, sourceFileNames, seen, types, visitedTypes)
     }
   }
 

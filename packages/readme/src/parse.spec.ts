@@ -31,6 +31,13 @@ describe('parsePublicApi', () => {
     expect(entries.find((e) => e.name === 'internal')).toBeUndefined()
   })
 
+  test('does not blow up on recursive types like Jsonifiable from type-fest', () => {
+    expect(() => parsePublicApi([fixture('jsonifiable')])).not.toThrow()
+    const { entries } = parsePublicApi([fixture('jsonifiable')])
+    expect(entries).toHaveLength(1)
+    expect(entries[0].name).toBe('serialize')
+  })
+
   describe('JSDoc type precedence over TypeScript types', () => {
     test('JSDoc @param {type} overrides TS-inferred param type', () => {
       const { entries } = parsePublicApi([fixture('jsdoc_types')])

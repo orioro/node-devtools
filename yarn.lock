@@ -2670,6 +2670,7 @@ __metadata:
     jest: "npm:^29.7.0"
     prettier: "npm:^3.8.1"
     rollup: "npm:^4.13.0"
+    type-fest: "npm:^5.5.0"
     typescript: "npm:^6.0.2"
   bin:
     readme: ./dist/cli.mjs
@@ -5298,9 +5299,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"create-orioro@workspace:packages/create-orioro":
+"create-oo@workspace:packages/create-oo":
   version: 0.0.0-use.local
-  resolution: "create-orioro@workspace:packages/create-orioro"
+  resolution: "create-oo@workspace:packages/create-oo"
   dependencies:
     "@clack/prompts": "npm:^1.2.0"
     "@orioro/dev": "workspace:^"
@@ -5313,7 +5314,7 @@ __metadata:
     jest: "npm:^29.7.0"
     rollup: "npm:^4.13.0"
   bin:
-    create-orioro: dist/cli.mjs
+    create-oo: dist/cli.mjs
   languageName: unknown
   linkType: soft
 
@@ -10218,6 +10219,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tagged-tag@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "tagged-tag@npm:1.0.0"
+  checksum: 91d25c9ffb86a91f20522cefb2cbec9b64caa1febe27ad0df52f08993ff60888022d771e868e6416cf2e72dab68449d2139e8709ba009b74c6c7ecd4000048d1
+  languageName: node
+  linkType: hard
+
 "tapable@npm:^2.0.0, tapable@npm:^2.1.1, tapable@npm:^2.2.1, tapable@npm:^2.3.0":
   version: 2.3.2
   resolution: "tapable@npm:2.3.2"
@@ -10439,6 +10447,15 @@ __metadata:
   version: 2.19.0
   resolution: "type-fest@npm:2.19.0"
   checksum: a5a7ecf2e654251613218c215c7493574594951c08e52ab9881c9df6a6da0aeca7528c213c622bc374b4e0cb5c443aa3ab758da4e3c959783ce884c3194e12cb
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "type-fest@npm:5.5.0"
+  dependencies:
+    tagged-tag: "npm:^1.0.0"
+  checksum: 60bf79a8df45abf99490e3204eceb5cf7f915413f8a69fb578c75cab37ddcb7d29ee21f185f0e1617323ac0b2a441e001b8dc691e220d0b087e9c29ea205538c
   languageName: node
   linkType: hard
 
