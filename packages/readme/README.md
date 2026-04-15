@@ -18,7 +18,7 @@ for `@public` JSDoc tags, and writes `README.md` with the API section appended.
 
 ## API
 
-### `parsePublicApi` — [source](src/parse.ts#L327)
+### `parsePublicApi` — [source](src/parse.ts#L353)
 
 ```ts
 function parsePublicApi(

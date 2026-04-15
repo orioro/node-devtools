@@ -170,7 +170,7 @@ Updates a user's profile fields.
 - \`id\` — \`string\` - user identifier
 - \`patch\` — \`Partial<UserProfile>\` - fields to update
 
-**Returns** \`UserProfile\`
+**Returns** [\`UserProfile\`](#userprofile)
 
 
 ## Types

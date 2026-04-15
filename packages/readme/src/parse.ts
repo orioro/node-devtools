@@ -86,6 +86,30 @@ function getParamDescriptions(node: ts.Node): Map<string, string> {
   return map
 }
 
+function getParamTypes(node: ts.Node): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const doc of getJsDocs(node)) {
+    for (const tag of doc.tags ?? []) {
+      if (ts.isJSDocParameterTag(tag) && tag.typeExpression) {
+        const name = tag.name.getText()
+        map.set(name, tag.typeExpression.type.getText())
+      }
+    }
+  }
+  return map
+}
+
+function getJsDocReturnType(node: ts.Node): string | undefined {
+  for (const doc of getJsDocs(node)) {
+    for (const tag of doc.tags ?? []) {
+      if (ts.isJSDocReturnTag(tag) && tag.typeExpression) {
+        return tag.typeExpression.type.getText()
+      }
+    }
+  }
+  return undefined
+}
+
 // ---------- Type helpers ----------
 
 function getLine(node: ts.Node): number {
@@ -219,6 +243,7 @@ function extractFromFunctionLike(
   const description = getJsDocDescription(node)
   const tags = getJsDocTags(node)
   const paramDescs = getParamDescriptions(node)
+  const paramTypes = getParamTypes(node)
 
   const rawTypes: ts.Type[] = []
 
@@ -228,7 +253,7 @@ function extractFromFunctionLike(
     rawTypes.push(paramType)
     return {
       name: paramName,
-      type: typeToString(checker, paramType),
+      type: paramTypes.get(paramName) ?? typeToString(checker, paramType),
       optional: !!p.questionToken || p.initializer !== undefined,
       description: paramDescs.get(paramName) ?? '',
     }
@@ -236,7 +261,8 @@ function extractFromFunctionLike(
 
   const sig = checker.getSignatureFromDeclaration(node)
   const returnType = sig ? checker.getReturnTypeOfSignature(sig) : undefined
-  const returnTypeStr = returnType ? typeToString(checker, returnType) : 'unknown'
+  const jsDocReturnType = getJsDocReturnType(node)
+  const returnTypeStr = jsDocReturnType ?? (returnType ? typeToString(checker, returnType) : 'unknown')
   if (returnType) rawTypes.push(returnType)
 
   return {

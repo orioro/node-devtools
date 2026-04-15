@@ -30,4 +30,27 @@ describe('parsePublicApi', () => {
     const { entries } = parsePublicApi([fixture('basic')])
     expect(entries.find((e) => e.name === 'internal')).toBeUndefined()
   })
+
+  describe('JSDoc type precedence over TypeScript types', () => {
+    test('JSDoc @param {type} overrides TS-inferred param type', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_types')])
+      const fn = entries.find((e) => e.name === 'format')!
+      expect(fn.params[0].type).toBe('any')
+      expect(fn.params[1].type).toBe('FormatterOptions')
+    })
+
+    test('JSDoc @returns {type} overrides TS-inferred return type', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_types')])
+      const fn = entries.find((e) => e.name === 'format')!
+      expect(fn.returnType).toBe('string')
+      expect(fn.signature).toContain(': string')
+    })
+
+    test('falls back to TS-inferred type when JSDoc type is absent', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_types')])
+      const fn = entries.find((e) => e.name === 'score')!
+      expect(fn.params[0].type).toBe('string')
+      expect(fn.returnType).toBe('number')
+    })
+  })
 })
