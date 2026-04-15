@@ -48,10 +48,13 @@ function renderToc(types: TypeDefinition[], entries: PublicEntry[]): string {
   return lines.join('\n\n')
 }
 
-function renderEntry(entry: PublicEntry): string {
+function renderEntry(entry: PublicEntry, { types }: ParseResult): string {
   const lines: string[] = []
+  const definedTypeNames = types.map((t) => t.name)
 
-  lines.push(`### \`${entry.name}\` — ${sourceLink(entry.filePath, entry.line)}`)
+  lines.push(
+    `### \`${entry.name}\` — ${sourceLink(entry.filePath, entry.line)}`,
+  )
   lines.push('')
   lines.push('```ts')
   lines.push(formatSignature(entry.signature))
@@ -66,17 +69,26 @@ function renderEntry(entry: PublicEntry): string {
     lines.push('')
     lines.push('**Parameters**')
     lines.push('')
+
     for (const p of entry.params) {
       const optional = p.optional ? ' _(optional)_' : ''
       const desc = p.description ? ` ${p.description}` : ''
-      lines.push(`- \`${p.name}\`${optional} — \`${p.type}\`${desc}`)
+      const typeText = definedTypeNames.includes(p.type)
+        ? `[\`${p.type}\`](#${toAnchor(p.type)})`
+        : `\`${p.type}\``
+      lines.push(`- \`${p.name}\`${optional} — ${typeText}${desc}`)
     }
   }
 
   if (entry.returnType && entry.returnType !== 'void') {
     lines.push('')
     const desc = entry.returnDescription ? ` — ${entry.returnDescription}` : ''
-    lines.push(`**Returns** \`${entry.returnType}\`${desc}`)
+
+    const typeText = definedTypeNames.includes(entry.returnType)
+      ? `[\`${entry.returnType}\`](#${toAnchor(entry.returnType)})`
+      : `\`${entry.returnType}\``
+
+    lines.push(`**Returns** ${typeText}${desc}`)
   }
 
   for (const example of entry.examples) {
@@ -109,7 +121,9 @@ function renderTypes(types: TypeDefinition[]): string {
 }
 
 /** @public */
-export function renderDocs({ entries, types }: ParseResult): string {
+export function renderDocs(parseResult: ParseResult): string {
+  const { entries, types } = parseResult
+
   if (entries.length === 0) return ''
 
   const sections: string[] = []
@@ -118,7 +132,7 @@ export function renderDocs({ entries, types }: ParseResult): string {
 
   const apiLines: string[] = ['## API', '']
   for (const entry of entries) {
-    apiLines.push(renderEntry(entry))
+    apiLines.push(renderEntry(entry, parseResult))
     apiLines.push('')
   }
   sections.push(apiLines.join('\n'))

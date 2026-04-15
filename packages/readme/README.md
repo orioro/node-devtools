@@ -38,17 +38,17 @@ alongside the entries in dependency order.
 - `filePaths` — `string[]` - absolute paths to source files to parse
 - `compilerOptions` _(optional)_ — `CompilerOptions` - optional TypeScript compiler options override
 
-**Returns** `ParseResult` — parsed entries and referenced local type definitions
+**Returns** [`ParseResult`](#parseresult) — parsed entries and referenced local type definitions
 
-### `renderDocs` — [source](src/render.ts#L112)
+### `renderDocs` — [source](src/render.ts#L124)
 
 ```ts
-function renderDocs({ entries, types }: ParseResult): string
+function renderDocs(parseResult: ParseResult): string
 ```
 
 **Parameters**
 
-- `{ entries, types }` — `ParseResult`
+- `parseResult` — [`ParseResult`](#parseresult)
 
 **Returns** `string`
 
