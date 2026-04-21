@@ -18,7 +18,9 @@ for `@public` JSDoc tags, and writes `README.md` with the API section appended.
 
 ## API
 
-### `parsePublicApi` — [source](src/parse.ts#L353)
+### `parsePublicApi`
+
+[src/parse.ts#L406](src/parse.ts#L406)
 
 ```ts
 function parsePublicApi(
@@ -40,7 +42,9 @@ alongside the entries in dependency order.
 
 **Returns** [`ParseResult`](#parseresult) — parsed entries and referenced local type definitions
 
-### `renderDocs` — [source](src/render.ts#L124)
+### `renderDocs`
+
+[src/render.ts#L125](src/render.ts#L125)
 
 ```ts
 function renderDocs(parseResult: ParseResult): string
@@ -55,7 +59,9 @@ function renderDocs(parseResult: ParseResult): string
 
 ## Types
 
-### `Param` — [source](src/parse.ts#L3)
+### `Param`
+
+[src/parse.ts#L5](src/parse.ts#L5)
 
 ```ts
 export type Param = {
@@ -66,7 +72,9 @@ export type Param = {
 }
 ```
 
-### `PublicEntry` — [source](src/parse.ts#L10)
+### `PublicEntry`
+
+[src/parse.ts#L12](src/parse.ts#L12)
 
 ```ts
 export type PublicEntry = {
@@ -77,24 +85,31 @@ export type PublicEntry = {
   params: Param[]
   returnType: string
   returnDescription: string
-  examples: string[]
+  examples: { name?: string; code: string }[]
+  readmeConfig: Record<string, string>
   filePath: string
+  relativeFilePath: string
   line: number
 }
 ```
 
-### `TypeDefinition` — [source](src/parse.ts#L23)
+### `TypeDefinition`
+
+[src/parse.ts#L27](src/parse.ts#L27)
 
 ```ts
 export type TypeDefinition = {
   name: string
   text: string
   filePath: string
+  relativeFilePath: string
   line: number
 }
 ```
 
-### `ParseResult` — [source](src/parse.ts#L30)
+### `ParseResult`
+
+[src/parse.ts#L35](src/parse.ts#L35)
 
 ```ts
 export type ParseResult = {

@@ -1,4 +1,6 @@
 import * as ts from 'typescript'
+import { dirname, relative } from 'node:path'
+import { packageUpSync } from 'package-up'
 
 export type Param = {
   name: string
@@ -18,6 +20,7 @@ export type PublicEntry = {
   examples: { name?: string; code: string }[]
   readmeConfig: Record<string, string>
   filePath: string
+  relativeFilePath: string
   line: number
 }
 
@@ -25,6 +28,7 @@ export type TypeDefinition = {
   name: string
   text: string
   filePath: string
+  relativeFilePath: string
   line: number
 }
 
@@ -413,6 +417,9 @@ export function parsePublicApi(
   const sourceFileNames = new Set(filePaths)
   const rawEntries: RawEntry[] = []
 
+  const pkgPath = packageUpSync({ cwd: filePaths[0] })
+  const pkgRoot = pkgPath ? dirname(pkgPath) : process.cwd()
+
   for (const filePath of filePaths) {
     const sourceFile = program.getSourceFile(filePath)
     if (!sourceFile) continue
@@ -433,7 +440,13 @@ export function parsePublicApi(
   }
 
   return {
-    entries: rawEntries.map((r) => r.entry),
-    types,
+    entries: rawEntries.map((r) => ({
+      ...r.entry,
+      relativeFilePath: relative(pkgRoot, r.entry.filePath),
+    })),
+    types: types.map((t) => ({
+      ...t,
+      relativeFilePath: relative(pkgRoot, t.filePath),
+    })),
   }
 }

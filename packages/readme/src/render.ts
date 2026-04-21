@@ -1,10 +1,8 @@
-import { relative } from 'node:path'
 import synchronizedPrettier from '@prettier/sync'
 import type { PublicEntry, TypeDefinition, ParseResult } from './parse.js'
 
-function sourceLink(filePath: string, line: number): string {
-  const rel = relative(process.cwd(), filePath)
-  return `[source](${rel}#L${line})`
+function sourceLink(relativeFilePath: string, line: number): string {
+  return `[${relativeFilePath}#L${line}](${relativeFilePath}#L${line})`
 }
 
 const PRETTIER_OPTIONS = {
@@ -52,9 +50,9 @@ function renderEntry(entry: PublicEntry, { types }: ParseResult): string {
   const lines: string[] = []
   const definedTypeNames = types.map((t) => t.name)
 
-  lines.push(
-    `### \`${entry.name}\` — ${sourceLink(entry.filePath, entry.line)}`,
-  )
+  lines.push(`### \`${entry.name}\``)
+  lines.push('')
+  lines.push(`${sourceLink(entry.relativeFilePath, entry.line)}`)
   lines.push('')
   lines.push('```ts')
   lines.push(formatSignature(entry.signature))
@@ -110,7 +108,9 @@ function renderTypes(types: TypeDefinition[]): string {
   const lines: string[] = ['## Types', '']
 
   for (const t of types) {
-    lines.push(`### \`${t.name}\` — ${sourceLink(t.filePath, t.line)}`)
+    lines.push(`### \`${t.name}\``)
+    lines.push('')
+    lines.push(`${sourceLink(t.relativeFilePath, t.line)}`)
     lines.push('')
     lines.push('```ts')
     lines.push(formatSignature(t.text))

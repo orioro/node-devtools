@@ -2668,6 +2668,7 @@ __metadata:
     babel-jest: "npm:^30.3.0"
     fast-glob: "npm:^3.3.3"
     jest: "npm:^29.7.0"
+    package-up: "npm:^5.0.0"
     prettier: "npm:^3.8.1"
     rollup: "npm:^4.13.0"
     type-fest: "npm:^5.5.0"
@@ -6212,6 +6213,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"find-up-simple@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "find-up-simple@npm:1.0.1"
+  checksum: ad34de157b7db925d50ff78302fefb28e309f3bc947c93ffca0f9b0bccf9cf1a2dc57d805d5c94ec9fc60f4838f5dbdfd2a48ecd77c23015fa44c6dd5f60bc40
+  languageName: node
+  linkType: hard
+
 "find-up@npm:^4.0.0, find-up@npm:^4.1.0":
   version: 4.1.0
   resolution: "find-up@npm:4.1.0"
@@ -8585,6 +8593,15 @@ __metadata:
   dependencies:
     quansync: "npm:^0.2.7"
   checksum: 247991de461b9e731f3463b7dae9ce187e53095b7b94d7d96eec039abf418b61ccf74464bec1d0c11d97311f33472e77baccd4c5898f77358da4b5b33395e0b1
+  languageName: node
+  linkType: hard
+
+"package-up@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "package-up@npm:5.0.0"
+  dependencies:
+    find-up-simple: "npm:^1.0.0"
+  checksum: 539ca3cded589ed374b9f729a94a0e09f1ffa9e640037c557ac209293d56685c8a6cee1f6fe08585ed125335ec7276d10e9c556cfc6bb3258dcb99af32fd5cb5
   languageName: node
   linkType: hard
 

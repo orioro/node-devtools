@@ -5,7 +5,9 @@ exports[`renderDocs examples preserves multi-line content within each example bl
 
 ## API
 
-### \`format\` — [source](src/__fixtures__/examples.ts#L29)
+### \`format\`
+
+[src/__fixtures__/examples.ts#L29](src/__fixtures__/examples.ts#L29)
 
 \`\`\`ts
 function format(value: unknown, template: string): string
@@ -56,7 +58,9 @@ exports[`renderDocs examples renders multiple examples each wrapped in a ts code
 
 ## API
 
-### \`format\` — [source](src/__fixtures__/examples.ts#L29)
+### \`format\`
+
+[src/__fixtures__/examples.ts#L29](src/__fixtures__/examples.ts#L29)
 
 \`\`\`ts
 function format(value: unknown, template: string): string
@@ -107,7 +111,9 @@ exports[`renderDocs renders basic function 1`] = `
 
 ## API
 
-### \`add\` — [source](src/__fixtures__/basic.ts#L10)
+### \`add\`
+
+[src/__fixtures__/basic.ts#L10](src/__fixtures__/basic.ts#L10)
 
 \`\`\`ts
 function add(a: number, b: number): number
@@ -137,7 +143,9 @@ exports[`renderDocs renders complex types, arrow functions, and classes 1`] = `
 
 ## API
 
-### \`Greeter\` — [source](src/__fixtures__/complex.ts#L28)
+### \`Greeter\`
+
+[src/__fixtures__/complex.ts#L28](src/__fixtures__/complex.ts#L28)
 
 \`\`\`ts
 class Greeter
@@ -145,7 +153,9 @@ class Greeter
 
 A simple class.
 
-### \`fetchUser\` — [source](src/__fixtures__/complex.ts#L10)
+### \`fetchUser\`
+
+[src/__fixtures__/complex.ts#L10](src/__fixtures__/complex.ts#L10)
 
 \`\`\`ts
 function fetchUser(
@@ -165,7 +175,9 @@ Fetches a user by id.
 
 **Returns** \`Promise<Result<{ id: string; name: string; }>>\` — resolved user result
 
-### \`greet\` — [source](src/__fixtures__/complex.ts#L22)
+### \`greet\`
+
+[src/__fixtures__/complex.ts#L22](src/__fixtures__/complex.ts#L22)
 
 \`\`\`ts
 function greet(name: string): string
@@ -180,7 +192,9 @@ function greet(name: string): string
 
 ## Types
 
-### \`Result\` — [source](src/__fixtures__/complex.ts#L1)
+### \`Result\`
+
+[src/__fixtures__/complex.ts#L1](src/__fixtures__/complex.ts#L1)
 
 \`\`\`ts
 type Result<T> = { data: T; error: null } | { data: null; error: string }
@@ -195,7 +209,9 @@ exports[`renderDocs renders constants with inferred and annotated types 1`] = `
 
 ## API
 
-### \`DEFAULT_CONFIG\` — [source](src/__fixtures__/constants.ts#L19)
+### \`DEFAULT_CONFIG\`
+
+[src/__fixtures__/constants.ts#L19](src/__fixtures__/constants.ts#L19)
 
 \`\`\`ts
 const DEFAULT_CONFIG: { timeout: number; retries: number; verbose: boolean }
@@ -203,7 +219,9 @@ const DEFAULT_CONFIG: { timeout: number; retries: number; verbose: boolean }
 
 Default request configuration.
 
-### \`DEFAULT_LOG_LEVEL\` — [source](src/__fixtures__/constants.ts#L29)
+### \`DEFAULT_LOG_LEVEL\`
+
+[src/__fixtures__/constants.ts#L29](src/__fixtures__/constants.ts#L29)
 
 \`\`\`ts
 const DEFAULT_LOG_LEVEL: LogLevel
@@ -211,7 +229,9 @@ const DEFAULT_LOG_LEVEL: LogLevel
 
 Default log level. Type inferred from explicit annotation.
 
-### \`MAX_RETRIES\` — [source](src/__fixtures__/constants.ts#L13)
+### \`MAX_RETRIES\`
+
+[src/__fixtures__/constants.ts#L13](src/__fixtures__/constants.ts#L13)
 
 \`\`\`ts
 const MAX_RETRIES: 3
@@ -219,7 +239,9 @@ const MAX_RETRIES: 3
 
 Maximum number of retries before giving up.
 
-### \`VERSION\` — [source](src/__fixtures__/constants.ts#L7)
+### \`VERSION\`
+
+[src/__fixtures__/constants.ts#L7](src/__fixtures__/constants.ts#L7)
 
 \`\`\`ts
 const VERSION: '1.0.0'
@@ -230,7 +252,9 @@ Current package version.
 
 ## Types
 
-### \`LogLevel\` — [source](src/__fixtures__/constants.ts#L1)
+### \`LogLevel\`
+
+[src/__fixtures__/constants.ts#L1](src/__fixtures__/constants.ts#L1)
 
 \`\`\`ts
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'
@@ -245,7 +269,9 @@ exports[`renderDocs renders type definitions section before API for locally-defi
 
 ## API
 
-### \`findUser\` — [source](src/__fixtures__/typed.ts#L21)
+### \`findUser\`
+
+[src/__fixtures__/typed.ts#L21](src/__fixtures__/typed.ts#L21)
 
 \`\`\`ts
 function findUser(id: string): UserProfile | null
@@ -259,7 +285,9 @@ Finds a user by id.
 
 **Returns** \`UserProfile | null\` — the matching user profile, or null if not found
 
-### \`updateUser\` — [source](src/__fixtures__/typed.ts#L31)
+### \`updateUser\`
+
+[src/__fixtures__/typed.ts#L31](src/__fixtures__/typed.ts#L31)
 
 \`\`\`ts
 function updateUser(id: string, patch: Partial<UserProfile>): UserProfile
@@ -277,13 +305,17 @@ Updates a user's profile fields.
 
 ## Types
 
-### \`Status\` — [source](src/__fixtures__/typed.ts#L1)
+### \`Status\`
+
+[src/__fixtures__/typed.ts#L1](src/__fixtures__/typed.ts#L1)
 
 \`\`\`ts
 type Status = 'active' | 'inactive' | 'pending'
 \`\`\`
 
-### \`Address\` — [source](src/__fixtures__/typed.ts#L3)
+### \`Address\`
+
+[src/__fixtures__/typed.ts#L3](src/__fixtures__/typed.ts#L3)
 
 \`\`\`ts
 type Address = {
@@ -292,7 +324,9 @@ type Address = {
 }
 \`\`\`
 
-### \`UserProfile\` — [source](src/__fixtures__/typed.ts#L8)
+### \`UserProfile\`
+
+[src/__fixtures__/typed.ts#L8](src/__fixtures__/typed.ts#L8)
 
 \`\`\`ts
 type UserProfile = {

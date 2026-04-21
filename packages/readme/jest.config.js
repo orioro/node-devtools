@@ -5,6 +5,6 @@ export default {
   },
   transformIgnorePatterns: [
     // Ignore all node_modules except those that need transpiling
-    'node_modules/'
-  ]
+    'node_modules/(!package-up)',
+  ],
 }

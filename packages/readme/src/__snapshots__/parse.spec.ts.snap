@@ -6,6 +6,7 @@ exports[`parsePublicApi collects referenced local type definitions in dependency
     {
       "description": "Finds a user by id.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "function",
       "line": 21,
       "name": "findUser",
@@ -18,6 +19,7 @@ exports[`parsePublicApi collects referenced local type definitions in dependency
         },
       ],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/typed.ts",
       "returnDescription": "the matching user profile, or null if not found",
       "returnType": "UserProfile | null",
       "signature": "function findUser(id: string): UserProfile | null",
@@ -25,6 +27,7 @@ exports[`parsePublicApi collects referenced local type definitions in dependency
     {
       "description": "Updates a user's profile fields.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "function",
       "line": 31,
       "name": "updateUser",
@@ -43,6 +46,7 @@ exports[`parsePublicApi collects referenced local type definitions in dependency
         },
       ],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/typed.ts",
       "returnDescription": "",
       "returnType": "UserProfile",
       "signature": "function updateUser(id: string, patch: Partial<UserProfile>): UserProfile",
@@ -50,24 +54,27 @@ exports[`parsePublicApi collects referenced local type definitions in dependency
   ],
   "types": [
     {
-      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/typed.ts",
+      "filePath": "omitted",
       "line": 1,
       "name": "Status",
+      "relativeFilePath": "src/__fixtures__/typed.ts",
       "text": "type Status = 'active' | 'inactive' | 'pending'",
     },
     {
-      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/typed.ts",
+      "filePath": "omitted",
       "line": 3,
       "name": "Address",
+      "relativeFilePath": "src/__fixtures__/typed.ts",
       "text": "type Address = {
   street: string
   city: string
 }",
     },
     {
-      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/typed.ts",
+      "filePath": "omitted",
       "line": 8,
       "name": "UserProfile",
+      "relativeFilePath": "src/__fixtures__/typed.ts",
       "text": "type UserProfile = {
   id: string
   name: string
@@ -85,11 +92,13 @@ exports[`parsePublicApi infers constant types, including from explicit annotatio
     {
       "description": "Current package version.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "constant",
       "line": 7,
       "name": "VERSION",
       "params": [],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/constants.ts",
       "returnDescription": "",
       "returnType": "",
       "signature": "const VERSION: "1.0.0"",
@@ -97,11 +106,13 @@ exports[`parsePublicApi infers constant types, including from explicit annotatio
     {
       "description": "Maximum number of retries before giving up.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "constant",
       "line": 13,
       "name": "MAX_RETRIES",
       "params": [],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/constants.ts",
       "returnDescription": "",
       "returnType": "",
       "signature": "const MAX_RETRIES: 3",
@@ -109,11 +120,13 @@ exports[`parsePublicApi infers constant types, including from explicit annotatio
     {
       "description": "Default request configuration.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "constant",
       "line": 19,
       "name": "DEFAULT_CONFIG",
       "params": [],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/constants.ts",
       "returnDescription": "",
       "returnType": "",
       "signature": "const DEFAULT_CONFIG: { timeout: number; retries: number; verbose: boolean; }",
@@ -121,11 +134,13 @@ exports[`parsePublicApi infers constant types, including from explicit annotatio
     {
       "description": "Default log level. Type inferred from explicit annotation.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "constant",
       "line": 29,
       "name": "DEFAULT_LOG_LEVEL",
       "params": [],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/constants.ts",
       "returnDescription": "",
       "returnType": "",
       "signature": "const DEFAULT_LOG_LEVEL: LogLevel",
@@ -133,9 +148,10 @@ exports[`parsePublicApi infers constant types, including from explicit annotatio
   ],
   "types": [
     {
-      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/constants.ts",
+      "filePath": "omitted",
       "line": 1,
       "name": "LogLevel",
+      "relativeFilePath": "src/__fixtures__/constants.ts",
       "text": "type LogLevel = 'debug' | 'info' | 'warn' | 'error'",
     },
   ],
@@ -152,6 +168,7 @@ exports[`parsePublicApi picks up @public functions and ignores the rest 1`] = `
           "code": "add(1, 2) // 3",
         },
       ],
+      "filePath": "omitted",
       "kind": "function",
       "line": 10,
       "name": "add",
@@ -170,6 +187,7 @@ exports[`parsePublicApi picks up @public functions and ignores the rest 1`] = `
         },
       ],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/basic.ts",
       "returnDescription": "the sum",
       "returnType": "number",
       "signature": "function add(a: number, b: number): number",
@@ -185,6 +203,7 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
     {
       "description": "Fetches a user by id.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "function",
       "line": 10,
       "name": "fetchUser",
@@ -203,6 +222,7 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
         },
       ],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/complex.ts",
       "returnDescription": "resolved user result",
       "returnType": "Promise<Result<{ id: string; name: string; }>>",
       "signature": "function fetchUser(id: string, options?: { timeout?: number | undefined; retries?: number | undefined; } | undefined): Promise<Result<{ id: string; name: string; }>>",
@@ -210,6 +230,7 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
     {
       "description": "",
       "examples": [],
+      "filePath": "omitted",
       "kind": "function",
       "line": 22,
       "name": "greet",
@@ -222,6 +243,7 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
         },
       ],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/complex.ts",
       "returnDescription": "",
       "returnType": "string",
       "signature": "function greet(name: string): string",
@@ -229,11 +251,13 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
     {
       "description": "A simple class.",
       "examples": [],
+      "filePath": "omitted",
       "kind": "class",
       "line": 28,
       "name": "Greeter",
       "params": [],
       "readmeConfig": {},
+      "relativeFilePath": "src/__fixtures__/complex.ts",
       "returnDescription": "",
       "returnType": "",
       "signature": "class Greeter",
@@ -241,9 +265,10 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
   ],
   "types": [
     {
-      "filePath": "/Users/simon/code/node-devtools/packages/readme/src/__fixtures__/complex.ts",
+      "filePath": "omitted",
       "line": 1,
       "name": "Result",
+      "relativeFilePath": "src/__fixtures__/complex.ts",
       "text": "type Result<T> = { data: T; error: null } | { data: null; error: string }",
     },
   ],
