@@ -142,7 +142,9 @@ exports[`parsePublicApi picks up @public functions and ignores the rest 1`] = `
     {
       "description": "Adds two numbers together.",
       "examples": [
-        "add(1, 2) // 3",
+        {
+          "code": "add(1, 2) // 3",
+        },
       ],
       "kind": "function",
       "line": 10,

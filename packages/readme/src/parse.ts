@@ -15,7 +15,7 @@ export type PublicEntry = {
   params: Param[]
   returnType: string
   returnDescription: string
-  examples: string[]
+  examples: { name?: string; code: string }[]
   filePath: string
   line: number
 }
@@ -67,8 +67,31 @@ function getJsDocTags(node: ts.Node): Map<string, string[]> {
   return tags
 }
 
-function getJsDocName(node: ts.Node): string | undefined {
-  return getJsDocTags(node).get('name')?.[0]
+function parseExample(raw: string): { name?: string; code: string } {
+  const caption = raw.match(/^<caption>(.*?)<\/caption>\n?/)
+  if (caption) return { name: caption[1].trim(), code: raw.slice(caption[0].length).trim() }
+  return { code: raw.trim() }
+}
+
+function getExamples(node: ts.Node): { name?: string; code: string }[] {
+  const examples: { name?: string; code: string }[] = []
+  for (const doc of getJsDocs(node)) {
+    for (const tag of doc.tags ?? []) {
+      if (tag.tagName.text === 'example') {
+        examples.push(parseExample(commentToString(tag.comment)))
+      }
+    }
+  }
+  return examples
+}
+
+function getName(node: ts.Node): string | undefined {
+  const tags = getJsDocTags(node)
+  if (tags.get('name')?.[0]) return tags.get('name')![0]
+  if (ts.isFunctionDeclaration(node) && node.name) return node.name.text
+  if (ts.isClassDeclaration(node) && node.name) return node.name.text
+  if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) return node.name.text
+  return undefined
 }
 
 function hasPublicTag(node: ts.Node): boolean {
@@ -103,7 +126,7 @@ function getParamTypes(node: ts.Node): Map<string, string> {
   return map
 }
 
-function getJsDocReturnType(node: ts.Node): string | undefined {
+function getReturnTypeStr(node: ts.FunctionLikeDeclaration, checker: ts.TypeChecker): string {
   for (const doc of getJsDocs(node)) {
     for (const tag of doc.tags ?? []) {
       if (ts.isJSDocReturnTag(tag) && tag.typeExpression) {
@@ -111,7 +134,9 @@ function getJsDocReturnType(node: ts.Node): string | undefined {
       }
     }
   }
-  return undefined
+  const sig = checker.getSignatureFromDeclaration(node)
+  const returnType = sig ? checker.getReturnTypeOfSignature(sig) : undefined
+  return returnType ? typeToString(checker, returnType) : 'unknown'
 }
 
 // ---------- Type helpers ----------
@@ -223,7 +248,7 @@ function extractConstant(
       params: [],
       returnType: '',
       returnDescription: '',
-      examples: getJsDocTags(jsDocNode).get('example') ?? [],
+      examples: getExamples(jsDocNode),
       filePath,
       line: getLine(decl),
     },
@@ -270,8 +295,7 @@ function extractFromFunctionLike(
 
   const sig = checker.getSignatureFromDeclaration(node)
   const returnType = sig ? checker.getReturnTypeOfSignature(sig) : undefined
-  const jsDocReturnType = getJsDocReturnType(node)
-  const returnTypeStr = jsDocReturnType ?? (returnType ? typeToString(checker, returnType) : 'unknown')
+  const returnTypeStr = getReturnTypeStr(node, checker)
   if (returnType) rawTypes.push(returnType)
 
   return {
@@ -284,7 +308,7 @@ function extractFromFunctionLike(
       returnType: returnTypeStr,
       returnDescription:
         (tags.get('returns') ?? tags.get('return') ?? [])[0] ?? '',
-      examples: tags.get('example') ?? [],
+      examples: getExamples(node),
       filePath,
       line: getLine(node),
     },
@@ -308,18 +332,16 @@ function visitNode(
   }
 
   if (ts.isFunctionDeclaration(node) && node.name) {
-    const name = getJsDocName(node) ?? node.name.text
-    rawEntries.push(extractFromFunctionLike(node, name, checker, filePath))
+    rawEntries.push(extractFromFunctionLike(node, getName(node)!, checker, filePath))
     return
   }
 
   if (ts.isVariableStatement(node)) {
-    const jsDocName = getJsDocName(node)
     for (const decl of node.declarationList.declarations) {
       if (!ts.isIdentifier(decl.name)) continue
       const init = decl.initializer
       if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
-        const name = jsDocName ?? decl.name.text
+        const name = getName(node) ?? decl.name.text
         rawEntries.push(extractFromFunctionLike(init, name, checker, filePath))
       } else {
         rawEntries.push(extractConstant(decl, checker, filePath, node))
@@ -330,7 +352,7 @@ function visitNode(
 
   if (ts.isClassDeclaration(node) && node.name) {
     const tags = getJsDocTags(node)
-    const name = getJsDocName(node) ?? node.name.text
+    const name = getName(node)!
     rawEntries.push({
       entry: {
         name,
@@ -340,7 +362,7 @@ function visitNode(
         params: [],
         returnType: '',
         returnDescription: '',
-        examples: tags.get('example') ?? [],
+        examples: getExamples(node),
         filePath,
         line: getLine(node),
       },

@@ -91,12 +91,13 @@ function renderEntry(entry: PublicEntry, { types }: ParseResult): string {
     lines.push(`**Returns** ${typeText}${desc}`)
   }
 
-  for (const example of entry.examples) {
+  for (const [i, example] of entry.examples.entries()) {
+    const label = example.name ? `Example: ${example.name}` : `Example ${i + 1}`
     lines.push('')
-    lines.push('**Example**')
+    lines.push(`**${label}**`)
     lines.push('')
     lines.push('```ts')
-    lines.push(example.trim())
+    lines.push(example.code)
     lines.push('```')
   }
 

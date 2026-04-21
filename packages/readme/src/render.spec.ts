@@ -25,4 +25,32 @@ describe('renderDocs', () => {
   test('renders type definitions section before API for locally-defined types', () => {
     expect(renderDocs(parsePublicApi([fixture('typed')]))).toMatchSnapshot()
   })
+
+  describe('examples', () => {
+    test('renders multiple examples each wrapped in a ts code block', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('examples')]))
+      const exampleBlocks =
+        rendered.match(/\*\*Example[^*]*\*\*\n\n```ts[\s\S]*?```/g) ?? []
+      expect(exampleBlocks).toHaveLength(2)
+
+      expect(rendered).toMatchSnapshot()
+    })
+
+    test('uses example name in label when provided, falls back to number', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('examples')]))
+      expect(rendered).toContain('**Example: Basic usage**')
+      expect(rendered).toContain('**Example 2**')
+    })
+
+    test('preserves multi-line content within each example block', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('examples')]))
+      const exampleBlocks =
+        rendered.match(/\*\*Example[^*]*\*\*\n\n```ts[\s\S]*?```/g) ?? []
+      expect(exampleBlocks[0]).toContain('The answer is {0}')
+      expect(exampleBlocks[0]).toContain('Flag is {0}')
+      expect(exampleBlocks[1]).toContain('greet(')
+
+      expect(rendered).toMatchSnapshot()
+    })
+  })
 })

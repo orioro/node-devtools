@@ -1,5 +1,107 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`renderDocs examples preserves multi-line content within each example block 1`] = `
+"**API:** [\`format\`](#format)
+
+## API
+
+### \`format\` — [source](src/__fixtures__/examples.ts#L29)
+
+\`\`\`ts
+function format(value: unknown, template: string): string
+\`\`\`
+
+Formats a value into a string using a template.
+
+**Parameters**
+
+- \`value\` — \`unknown\` - the value to format
+- \`template\` — \`string\` - the template string
+
+**Returns** \`string\` — the formatted string
+
+**Example: Basic usage**
+
+\`\`\`ts
+// Works with numbers
+const result = format(42, 'The answer is {0}')
+console.log(result)
+// => 'The answer is 42'
+
+// Works with any value
+const bool = format(true, 'Flag is {0}')
+console.log(bool)
+// => 'Flag is true'
+\`\`\`
+
+**Example 2**
+
+\`\`\`ts
+// Nested inside a helper
+function greet(name: string): string {
+  return format(name, 'Hello, {0}! Welcome back.')
+}
+
+console.log(greet('Alice'))
+// => 'Hello, Alice! Welcome back.'
+
+console.log(greet('Bob'))
+// => 'Hello, Bob! Welcome back.'
+\`\`\`
+"
+`;
+
+exports[`renderDocs examples renders multiple examples each wrapped in a ts code block 1`] = `
+"**API:** [\`format\`](#format)
+
+## API
+
+### \`format\` — [source](src/__fixtures__/examples.ts#L29)
+
+\`\`\`ts
+function format(value: unknown, template: string): string
+\`\`\`
+
+Formats a value into a string using a template.
+
+**Parameters**
+
+- \`value\` — \`unknown\` - the value to format
+- \`template\` — \`string\` - the template string
+
+**Returns** \`string\` — the formatted string
+
+**Example: Basic usage**
+
+\`\`\`ts
+// Works with numbers
+const result = format(42, 'The answer is {0}')
+console.log(result)
+// => 'The answer is 42'
+
+// Works with any value
+const bool = format(true, 'Flag is {0}')
+console.log(bool)
+// => 'Flag is true'
+\`\`\`
+
+**Example 2**
+
+\`\`\`ts
+// Nested inside a helper
+function greet(name: string): string {
+  return format(name, 'Hello, {0}! Welcome back.')
+}
+
+console.log(greet('Alice'))
+// => 'Hello, Alice! Welcome back.'
+
+console.log(greet('Bob'))
+// => 'Hello, Bob! Welcome back.'
+\`\`\`
+"
+`;
+
 exports[`renderDocs renders basic function 1`] = `
 "**API:** [\`add\`](#add)
 
@@ -20,7 +122,7 @@ Adds two numbers together.
 
 **Returns** \`number\` — the sum
 
-**Example**
+**Example 1**
 
 \`\`\`ts
 add(1, 2) // 3
