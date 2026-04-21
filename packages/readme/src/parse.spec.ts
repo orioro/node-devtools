@@ -38,6 +38,26 @@ describe('parsePublicApi', () => {
     expect(entries[0].name).toBe('serialize')
   })
 
+  describe('@name tag', () => {
+    test('uses @name when present instead of the AST identifier', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_name')])
+      const fn = entries.find((e) => e.name === 'publicName')!
+      expect(fn).toBeDefined()
+      expect(fn.signature).toContain('publicName')
+    })
+
+    test('falls back to AST identifier when @name is absent', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_name')])
+      const fn = entries.find((e) => e.name === 'noAlias')!
+      expect(fn).toBeDefined()
+    })
+
+    test('no entry exists under the original AST name when @name overrides it', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_name')])
+      expect(entries.find((e) => e.name === '_internalName')).toBeUndefined()
+    })
+  })
+
   describe('JSDoc type precedence over TypeScript types', () => {
     test('JSDoc @param {type} overrides TS-inferred param type', () => {
       const { entries } = parsePublicApi([fixture('jsdoc_types')])

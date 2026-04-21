@@ -67,6 +67,10 @@ function getJsDocTags(node: ts.Node): Map<string, string[]> {
   return tags
 }
 
+function getJsDocName(node: ts.Node): string | undefined {
+  return getJsDocTags(node).get('name')?.[0]
+}
+
 function hasPublicTag(node: ts.Node): boolean {
   return getJsDocs(node).some((doc) =>
     doc.tags?.some((t) => t.tagName.text === 'public'),
@@ -304,16 +308,19 @@ function visitNode(
   }
 
   if (ts.isFunctionDeclaration(node) && node.name) {
-    rawEntries.push(extractFromFunctionLike(node, node.name.text, checker, filePath))
+    const name = getJsDocName(node) ?? node.name.text
+    rawEntries.push(extractFromFunctionLike(node, name, checker, filePath))
     return
   }
 
   if (ts.isVariableStatement(node)) {
+    const jsDocName = getJsDocName(node)
     for (const decl of node.declarationList.declarations) {
       if (!ts.isIdentifier(decl.name)) continue
       const init = decl.initializer
       if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
-        rawEntries.push(extractFromFunctionLike(init, decl.name.text, checker, filePath))
+        const name = jsDocName ?? decl.name.text
+        rawEntries.push(extractFromFunctionLike(init, name, checker, filePath))
       } else {
         rawEntries.push(extractConstant(decl, checker, filePath, node))
       }
@@ -323,11 +330,12 @@ function visitNode(
 
   if (ts.isClassDeclaration(node) && node.name) {
     const tags = getJsDocTags(node)
+    const name = getJsDocName(node) ?? node.name.text
     rawEntries.push({
       entry: {
-        name: node.name.text,
+        name,
         kind: 'class',
-        signature: `class ${node.name.text}`,
+        signature: `class ${name}`,
         description: getJsDocDescription(node),
         params: [],
         returnType: '',
