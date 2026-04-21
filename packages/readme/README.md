@@ -3,14 +3,135 @@
 Scans TypeScript source files for `@public`-tagged functions and generates
 markdown API documentation appended to a `.README.md` template.
 
-## Usage
+## Installation
 
-```
-yarn readme
+```bash
+npm install --save-dev @orioro/readme
+# or
+yarn add --dev @orioro/readme
 ```
 
-Reads `.README.md` from the current directory, scans `src/**/*.{ts,tsx,js,jsx}`
-for `@public` JSDoc tags, and writes `README.md` with the API section appended.
+Add a script to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "readme": "readme"
+  }
+}
+```
+
+Then create a `.README.md` template in your project root with your hand-written
+content. Running `npm run readme` (or `yarn readme`) will append the generated
+API section to it and write `README.md`.
+
+## Workflow
+
+1. Write your public API functions and annotate them with `@public` in JSDoc
+2. Keep a `.README.md` with your intro, examples, and any hand-written content
+3. Run `npm run readme` to regenerate `README.md` — commit both files
+
+## JSDoc tags
+
+### `@public`
+
+Marks a function, arrow function, constant, or class for inclusion in the
+generated docs. Symbols without this tag are ignored.
+
+```ts
+/**
+ * Adds two numbers.
+ * @public
+ */
+export function add(a: number, b: number): number {
+  return a + b
+}
+```
+
+### `@name`
+
+Overrides the name used in the docs. Useful when the exported symbol has an
+internal name that shouldn't be surfaced.
+
+```ts
+/**
+ * @public
+ * @name createClient
+ */
+export function _createClientInternal(): Client { ... }
+```
+
+### `@example`
+
+Adds a code example. Multiple `@example` tags are supported. To give an example
+a title, use `<caption>`:
+
+```ts
+/**
+ * @public
+ * @example <caption>Basic usage</caption>
+ * add(1, 2) // => 3
+ * @example
+ * const result = add(10, 20)
+ * console.log(result) // => 30
+ */
+export function add(a: number, b: number): number { ... }
+```
+
+Examples without a `<caption>` are numbered automatically (`Example 1`,
+`Example 2`, …).
+
+### `@readme`
+
+Controls rendering options via space-separated `key=value` pairs.
+
+#### `order`
+
+Sets the position of the entry in the rendered output. Entries with an explicit
+order appear first (sorted by order value, then alphabetically on ties).
+Entries without an order are sorted alphabetically after all ordered entries.
+
+```ts
+/**
+ * @public
+ * @readme order=1
+ */
+export function primaryFunction() { ... }
+
+/**
+ * @public
+ * @readme order=2
+ */
+export function secondaryFunction() { ... }
+
+/**
+ * @public
+ */
+export function unorderedFunction() { ... }
+```
+
+## Configuration
+
+By default the CLI scans `src/**/*.{ts,tsx,js,jsx}` and reads `.README.md` from
+the current directory. To override, create a `readme.config.js` at the project
+root:
+
+```js
+export default (defaults) => ({
+  ...defaults,
+  include: ['lib/**/*.ts'],
+  ignore: [...defaults.ignore, '**/generated/**'],
+})
+```
+
+Available options:
+
+| Option         | Default                    | Description               |
+| -------------- | -------------------------- | ------------------------- |
+| `templatePath` | `.README.md`               | Path to the template file |
+| `outputPath`   | `README.md`                | Path to write the output  |
+| `include`      | `src/**/*.{ts,tsx,js,jsx}` | Glob patterns to scan     |
+| `ignore`       | spec, test, d.ts, fixtures | Glob patterns to exclude  |
 
 **API:** [`parsePublicApi`](#parsepublicapi) · [`renderDocs`](#renderdocs)
 
