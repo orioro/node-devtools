@@ -16,6 +16,7 @@ export type PublicEntry = {
   returnType: string
   returnDescription: string
   examples: { name?: string; code: string }[]
+  readmeConfig: Record<string, string>
   filePath: string
   line: number
 }
@@ -65,6 +66,16 @@ function getJsDocTags(node: ts.Node): Map<string, string[]> {
     }
   }
   return tags
+}
+
+function getReadmeConfig(node: ts.Node): Record<string, string> {
+  const tag = getJsDocTags(node).get('readme')?.[0]
+  if (!tag) return {}
+  return Object.fromEntries(
+    tag.split(/\s+/)
+      .filter((pair) => pair.includes('='))
+      .map((pair) => pair.split('=') as [string, string])
+  )
 }
 
 function parseExample(raw: string): { name?: string; code: string } {
@@ -249,6 +260,7 @@ function extractConstant(
       returnType: '',
       returnDescription: '',
       examples: getExamples(jsDocNode),
+      readmeConfig: getReadmeConfig(jsDocNode),
       filePath,
       line: getLine(decl),
     },
@@ -309,6 +321,7 @@ function extractFromFunctionLike(
       returnDescription:
         (tags.get('returns') ?? tags.get('return') ?? [])[0] ?? '',
       examples: getExamples(node),
+      readmeConfig: getReadmeConfig(node),
       filePath,
       line: getLine(node),
     },
@@ -363,6 +376,7 @@ function visitNode(
         returnType: '',
         returnDescription: '',
         examples: getExamples(node),
+        readmeConfig: getReadmeConfig(node),
         filePath,
         line: getLine(node),
       },

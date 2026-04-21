@@ -26,6 +26,37 @@ describe('renderDocs', () => {
     expect(renderDocs(parsePublicApi([fixture('typed')]))).toMatchSnapshot()
   })
 
+  describe('ordering', () => {
+    const getOrder = (rendered: string) =>
+      [...rendered.matchAll(/### `(\w+)`/g)].map((m) => m[1])
+
+    test('ordered entries appear before unordered entries', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('ordering')]))
+      const names = getOrder(rendered)
+      const lastOrdered = names.indexOf('second') // order=2, last of ordered group
+      const firstUnordered = names.indexOf('alpha') // first alphabetically of unordered
+      expect(lastOrdered).toBeLessThan(firstUnordered)
+    })
+
+    test('ordered entries are sorted by order value', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('ordering')]))
+      const names = getOrder(rendered)
+      expect(names.indexOf('first')).toBeLessThan(names.indexOf('second'))
+    })
+
+    test('ties in order value are broken alphabetically', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('ordering')]))
+      const names = getOrder(rendered)
+      expect(names.indexOf('also')).toBeLessThan(names.indexOf('second'))
+    })
+
+    test('unordered entries are sorted alphabetically', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('ordering')]))
+      const names = getOrder(rendered)
+      expect(names.indexOf('alpha')).toBeLessThan(names.indexOf('zebra'))
+    })
+  })
+
   describe('examples', () => {
     test('renders multiple examples each wrapped in a ts code block', () => {
       const rendered = renderDocs(parsePublicApi([fixture('examples')]))

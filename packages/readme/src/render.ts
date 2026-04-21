@@ -127,12 +127,24 @@ export function renderDocs(parseResult: ParseResult): string {
 
   if (entries.length === 0) return ''
 
+  const ordered = [...entries].sort((a, b) => {
+    const aOrder = a.readmeConfig.order
+    const bOrder = b.readmeConfig.order
+    if (aOrder !== undefined && bOrder !== undefined) {
+      if (aOrder !== bOrder) return aOrder < bOrder ? -1 : 1
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+    }
+    if (aOrder !== undefined) return -1
+    if (bOrder !== undefined) return 1
+    return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+  })
+
   const sections: string[] = []
 
-  sections.push(renderToc(types, entries))
+  sections.push(renderToc(types, ordered))
 
   const apiLines: string[] = ['## API', '']
-  for (const entry of entries) {
+  for (const entry of ordered) {
     apiLines.push(renderEntry(entry, parseResult))
     apiLines.push('')
   }

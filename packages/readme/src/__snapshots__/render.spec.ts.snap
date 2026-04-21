@@ -131,11 +131,19 @@ add(1, 2) // 3
 `;
 
 exports[`renderDocs renders complex types, arrow functions, and classes 1`] = `
-"**API:** [\`fetchUser\`](#fetchuser) · [\`greet\`](#greet) · [\`Greeter\`](#greeter)
+"**API:** [\`Greeter\`](#greeter) · [\`fetchUser\`](#fetchuser) · [\`greet\`](#greet)
 
 **Types:** [\`Result\`](#result)
 
 ## API
+
+### \`Greeter\` — [source](src/__fixtures__/complex.ts#L28)
+
+\`\`\`ts
+class Greeter
+\`\`\`
+
+A simple class.
 
 ### \`fetchUser\` — [source](src/__fixtures__/complex.ts#L10)
 
@@ -169,14 +177,6 @@ function greet(name: string): string
 
 **Returns** \`string\`
 
-### \`Greeter\` — [source](src/__fixtures__/complex.ts#L28)
-
-\`\`\`ts
-class Greeter
-\`\`\`
-
-A simple class.
-
 
 ## Types
 
@@ -189,27 +189,11 @@ type Result<T> = { data: T; error: null } | { data: null; error: string }
 `;
 
 exports[`renderDocs renders constants with inferred and annotated types 1`] = `
-"**API:** [\`VERSION\`](#version) · [\`MAX_RETRIES\`](#maxretries) · [\`DEFAULT_CONFIG\`](#defaultconfig) · [\`DEFAULT_LOG_LEVEL\`](#defaultloglevel)
+"**API:** [\`DEFAULT_CONFIG\`](#defaultconfig) · [\`DEFAULT_LOG_LEVEL\`](#defaultloglevel) · [\`MAX_RETRIES\`](#maxretries) · [\`VERSION\`](#version)
 
 **Types:** [\`LogLevel\`](#loglevel)
 
 ## API
-
-### \`VERSION\` — [source](src/__fixtures__/constants.ts#L7)
-
-\`\`\`ts
-const VERSION: '1.0.0'
-\`\`\`
-
-Current package version.
-
-### \`MAX_RETRIES\` — [source](src/__fixtures__/constants.ts#L13)
-
-\`\`\`ts
-const MAX_RETRIES: 3
-\`\`\`
-
-Maximum number of retries before giving up.
 
 ### \`DEFAULT_CONFIG\` — [source](src/__fixtures__/constants.ts#L19)
 
@@ -226,6 +210,22 @@ const DEFAULT_LOG_LEVEL: LogLevel
 \`\`\`
 
 Default log level. Type inferred from explicit annotation.
+
+### \`MAX_RETRIES\` — [source](src/__fixtures__/constants.ts#L13)
+
+\`\`\`ts
+const MAX_RETRIES: 3
+\`\`\`
+
+Maximum number of retries before giving up.
+
+### \`VERSION\` — [source](src/__fixtures__/constants.ts#L7)
+
+\`\`\`ts
+const VERSION: '1.0.0'
+\`\`\`
+
+Current package version.
 
 
 ## Types
