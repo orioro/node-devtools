@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import fg from 'fast-glob'
 import { parsePublicApi } from './parse.js'
 import { renderDocs } from './render.js'
+import { parseTodos, renderTodos } from './todos.js'
 
 type Config = {
   templatePath: string
   outputPath: string
+  todoOutputPath: string
   include: string[]
   ignore: string[]
 }
@@ -17,9 +19,12 @@ const cwd = process.cwd()
 const defaults: Config = {
   templatePath: join(cwd, '.README.md'),
   outputPath: join(cwd, 'README.md'),
+  todoOutputPath: join(cwd, 'TODO.md'),
   include: ['src/**/*.{ts,tsx,js,jsx}'],
   ignore: ['**/*.spec.*', '**/*.test.*', '**/*.d.ts', '**/__fixtures__/**'],
 }
+
+const writeTodos = process.argv.includes('--todo')
 
 async function main() {
   let config = defaults
@@ -29,7 +34,9 @@ async function main() {
     const mod = await import(configPath)
     const exported = mod.default ?? mod
     config =
-      typeof exported === 'function' ? exported(defaults) : { ...defaults, ...exported }
+      typeof exported === 'function'
+        ? exported(defaults)
+        : { ...defaults, ...exported }
   }
 
   if (!existsSync(config.templatePath)) {
@@ -51,7 +58,29 @@ async function main() {
   const output = docs ? `${template.trimEnd()}\n\n${docs}` : template
 
   writeFileSync(config.outputPath, output)
-  console.log(`README.md written (${result.entries.length} public entries, ${result.types.length} types)`)
+  console.log(
+    `README.md written (${result.entries.length} public entries, ${result.types.length} types)`,
+  )
+
+  if (writeTodos) {
+    const todos = parseTodos(files.map((f) => resolve(f)))
+
+    if (todos.length > 0) {
+      writeFileSync(config.todoOutputPath, renderTodos(todos))
+
+      console.log(
+        `TODO.md written (${todos.length} item${todos.length === 1 ? '' : 's'})`,
+      )
+    } else {
+      try {
+        unlinkSync(config.todoOutputPath)
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err
+      }
+
+      console.log(`No TODOs found, removed TODO.md file`)
+    }
+  }
 }
 
 main()
