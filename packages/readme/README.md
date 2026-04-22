@@ -329,7 +329,7 @@ const docs = renderDocs(result)
 
 #### `parseTodos`
 
-[src/todos.ts#L148](src/todos.ts#L148)
+[src/todos.ts#L144](src/todos.ts#L144)
 
 ```ts
 function parseTodos(filePaths: string[]): TodoEntry[]
@@ -347,7 +347,7 @@ is captured in full for all comment types.
 
 #### `renderTodos`
 
-[src/todos.ts#L165](src/todos.ts#L165)
+[src/todos.ts#L161](src/todos.ts#L161)
 
 ```ts
 function renderTodos(todos: TodoEntry[]): string
