@@ -1,4 +1,6 @@
 import * as ts from 'typescript'
+import { dirname, relative } from 'node:path'
+import { packageUpSync } from 'package-up'
 
 export type Param = {
   name: string
@@ -15,8 +17,10 @@ export type PublicEntry = {
   params: Param[]
   returnType: string
   returnDescription: string
-  examples: string[]
+  examples: { name?: string; code: string }[]
+  readmeConfig: Record<string, string>
   filePath: string
+  relativeFilePath: string
   line: number
 }
 
@@ -24,6 +28,7 @@ export type TypeDefinition = {
   name: string
   text: string
   filePath: string
+  relativeFilePath: string
   line: number
 }
 
@@ -67,6 +72,49 @@ function getJsDocTags(node: ts.Node): Map<string, string[]> {
   return tags
 }
 
+function getReadmeConfig(node: ts.Node): Record<string, string> {
+  const tag = getJsDocTags(node).get('readme')?.[0]
+  if (!tag) return {}
+  return Object.fromEntries(
+    tag
+      .split(/\s+/)
+      .filter((pair) => pair.includes('='))
+      .map((pair) => pair.split('=') as [string, string]),
+  )
+}
+
+function parseExample(raw: string): { name?: string; code: string } {
+  const caption = raw.match(/^<caption>(.*?)<\/caption>\n?/)
+  if (caption)
+    return {
+      name: caption[1].trim(),
+      code: raw.slice(caption[0].length).trim(),
+    }
+  return { code: raw.trim() }
+}
+
+function getExamples(node: ts.Node): { name?: string; code: string }[] {
+  const examples: { name?: string; code: string }[] = []
+  for (const doc of getJsDocs(node)) {
+    for (const tag of doc.tags ?? []) {
+      if (tag.tagName.text === 'example') {
+        examples.push(parseExample(commentToString(tag.comment)))
+      }
+    }
+  }
+  return examples
+}
+
+function getName(node: ts.Node): string | undefined {
+  const tags = getJsDocTags(node)
+  if (tags.get('name')?.[0]) return tags.get('name')![0]
+  if (ts.isFunctionDeclaration(node) && node.name) return node.name.text
+  if (ts.isClassDeclaration(node) && node.name) return node.name.text
+  if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name))
+    return node.name.text
+  return undefined
+}
+
 function hasPublicTag(node: ts.Node): boolean {
   return getJsDocs(node).some((doc) =>
     doc.tags?.some((t) => t.tagName.text === 'public'),
@@ -99,7 +147,10 @@ function getParamTypes(node: ts.Node): Map<string, string> {
   return map
 }
 
-function getJsDocReturnType(node: ts.Node): string | undefined {
+function getReturnTypeStr(
+  node: ts.FunctionLikeDeclaration,
+  checker: ts.TypeChecker,
+): string {
   for (const doc of getJsDocs(node)) {
     for (const tag of doc.tags ?? []) {
       if (ts.isJSDocReturnTag(tag) && tag.typeExpression) {
@@ -107,7 +158,9 @@ function getJsDocReturnType(node: ts.Node): string | undefined {
       }
     }
   }
-  return undefined
+  const sig = checker.getSignatureFromDeclaration(node)
+  const returnType = sig ? checker.getReturnTypeOfSignature(sig) : undefined
+  return returnType ? typeToString(checker, returnType) : 'unknown'
 }
 
 // ---------- Type helpers ----------
@@ -159,7 +212,8 @@ function collectTypeDefs(
     seen.add(symbol)
 
     // Skip anonymous/synthetic types and generic type parameters (T, K, V …)
-    const isAnonymous = symbol.getName() === '__type' || symbol.getName() === '__object'
+    const isAnonymous =
+      symbol.getName() === '__type' || symbol.getName() === '__object'
     const isTypeParam = !!(symbol.flags & ts.SymbolFlags.TypeParameter)
     if (isAnonymous || isTypeParam) return
 
@@ -169,7 +223,14 @@ function collectTypeDefs(
 
     if (localDecl) {
       // Recurse into this declaration first → dependencies output before dependents
-      walkTypeRefs(localDecl, checker, sourceFileNames, seen, result, visitedTypes)
+      walkTypeRefs(
+        localDecl,
+        checker,
+        sourceFileNames,
+        seen,
+        result,
+        visitedTypes,
+      )
 
       result.push({
         name: symbol.getName(),
@@ -184,8 +245,7 @@ function collectTypeDefs(
   // For generic instantiations (e.g. Promise<User>, Partial<User>), recurse
   // into the type arguments even if the outer type isn't local
   const typeArgs =
-    (type as ts.TypeReference).typeArguments ??
-    type.aliasTypeArguments
+    (type as ts.TypeReference).typeArguments ?? type.aliasTypeArguments
 
   for (const arg of typeArgs ?? []) {
     collectTypeDefs(arg, checker, sourceFileNames, seen, result, visitedTypes)
@@ -219,7 +279,8 @@ function extractConstant(
       params: [],
       returnType: '',
       returnDescription: '',
-      examples: getJsDocTags(jsDocNode).get('example') ?? [],
+      examples: getExamples(jsDocNode),
+      readmeConfig: getReadmeConfig(jsDocNode),
       filePath,
       line: getLine(decl),
     },
@@ -227,7 +288,11 @@ function extractConstant(
   }
 }
 
-function buildSignature(name: string, params: Param[], returnType: string): string {
+function buildSignature(
+  name: string,
+  params: Param[],
+  returnType: string,
+): string {
   const paramStr = params
     .map((p) => `${p.name}${p.optional ? '?' : ''}: ${p.type}`)
     .join(', ')
@@ -266,8 +331,7 @@ function extractFromFunctionLike(
 
   const sig = checker.getSignatureFromDeclaration(node)
   const returnType = sig ? checker.getReturnTypeOfSignature(sig) : undefined
-  const jsDocReturnType = getJsDocReturnType(node)
-  const returnTypeStr = jsDocReturnType ?? (returnType ? typeToString(checker, returnType) : 'unknown')
+  const returnTypeStr = getReturnTypeStr(node, checker)
   if (returnType) rawTypes.push(returnType)
 
   return {
@@ -280,7 +344,8 @@ function extractFromFunctionLike(
       returnType: returnTypeStr,
       returnDescription:
         (tags.get('returns') ?? tags.get('return') ?? [])[0] ?? '',
-      examples: tags.get('example') ?? [],
+      examples: getExamples(node),
+      readmeConfig: getReadmeConfig(node),
       filePath,
       line: getLine(node),
     },
@@ -304,7 +369,9 @@ function visitNode(
   }
 
   if (ts.isFunctionDeclaration(node) && node.name) {
-    rawEntries.push(extractFromFunctionLike(node, node.name.text, checker, filePath))
+    rawEntries.push(
+      extractFromFunctionLike(node, getName(node)!, checker, filePath),
+    )
     return
   }
 
@@ -313,7 +380,8 @@ function visitNode(
       if (!ts.isIdentifier(decl.name)) continue
       const init = decl.initializer
       if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
-        rawEntries.push(extractFromFunctionLike(init, decl.name.text, checker, filePath))
+        const name = getName(node) ?? decl.name.text
+        rawEntries.push(extractFromFunctionLike(init, name, checker, filePath))
       } else {
         rawEntries.push(extractConstant(decl, checker, filePath, node))
       }
@@ -323,16 +391,18 @@ function visitNode(
 
   if (ts.isClassDeclaration(node) && node.name) {
     const tags = getJsDocTags(node)
+    const name = getName(node)!
     rawEntries.push({
       entry: {
-        name: node.name.text,
+        name,
         kind: 'class',
-        signature: `class ${node.name.text}`,
+        signature: `class ${name}`,
         description: getJsDocDescription(node),
         params: [],
         returnType: '',
         returnDescription: '',
-        examples: tags.get('example') ?? [],
+        examples: getExamples(node),
+        readmeConfig: getReadmeConfig(node),
         filePath,
         line: getLine(node),
       },
@@ -350,10 +420,27 @@ function visitNode(
  * Parameter types and return types are resolved from the TypeScript type
  * checker. Referenced local type definitions are collected and returned
  * alongside the entries in dependency order.
- * @public
  * @param filePaths - absolute paths to source files to parse
  * @param compilerOptions - optional TypeScript compiler options override
  * @returns parsed entries and referenced local type definitions
+ *
+ * @example <caption>Basic usage</caption>
+ * import { parsePublicApi } from '@orioro/readme'
+ * import { resolve } from 'node:path'
+ * import fg from 'fast-glob'
+ *
+ * const files = await fg('src/**\/*.ts', { absolute: true })
+ * const result = parsePublicApi(files.map((f) => resolve(f)))
+ *
+ * @example <caption>Custom compiler options</caption>
+ * import { ScriptTarget } from 'typescript'
+ *
+ * const result = parsePublicApi(files, {
+ *   strict: false,
+ *   target: ScriptTarget.ES2020,
+ * })
+ * @readme category=Parse
+ * @public
  */
 export function parsePublicApi(
   filePaths: string[],
@@ -368,6 +455,9 @@ export function parsePublicApi(
   const checker = program.getTypeChecker()
   const sourceFileNames = new Set(filePaths)
   const rawEntries: RawEntry[] = []
+
+  const pkgPath = packageUpSync({ cwd: filePaths[0] })
+  const pkgRoot = pkgPath ? dirname(pkgPath) : process.cwd()
 
   for (const filePath of filePaths) {
     const sourceFile = program.getSourceFile(filePath)
@@ -389,7 +479,13 @@ export function parsePublicApi(
   }
 
   return {
-    entries: rawEntries.map((r) => r.entry),
-    types,
+    entries: rawEntries.map((r) => ({
+      ...r.entry,
+      relativeFilePath: relative(pkgRoot, r.entry.filePath),
+    })),
+    types: types.map((t) => ({
+      ...t,
+      relativeFilePath: relative(pkgRoot, t.filePath),
+    })),
   }
 }

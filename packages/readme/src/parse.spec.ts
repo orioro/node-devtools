@@ -4,26 +4,33 @@ import { parsePublicApi } from './parse'
 const fixture = (name: string) =>
   resolve(__dirname, '__fixtures__', `${name}.ts`)
 
-const normalize = ({ entries, types }: ReturnType<typeof parsePublicApi>) => ({
+const _omitFilePath = ({
+  entries,
   types,
-  entries: entries.map(({ filePath: _, ...rest }) => rest),
+}: ReturnType<typeof parsePublicApi>) => ({
+  types: types.map((item) => ({ ...item, filePath: 'omitted' })),
+  entries: entries.map((item) => ({ ...item, filePath: 'omitted' })),
 })
 
 describe('parsePublicApi', () => {
   test('picks up @public functions and ignores the rest', () => {
-    expect(normalize(parsePublicApi([fixture('basic')]))).toMatchSnapshot()
+    expect(_omitFilePath(parsePublicApi([fixture('basic')]))).toMatchSnapshot()
   })
 
   test('resolves complex return types and optional params', () => {
-    expect(normalize(parsePublicApi([fixture('complex')]))).toMatchSnapshot()
+    expect(
+      _omitFilePath(parsePublicApi([fixture('complex')])),
+    ).toMatchSnapshot()
   })
 
   test('collects referenced local type definitions in dependency order', () => {
-    expect(normalize(parsePublicApi([fixture('typed')]))).toMatchSnapshot()
+    expect(_omitFilePath(parsePublicApi([fixture('typed')]))).toMatchSnapshot()
   })
 
   test('infers constant types, including from explicit annotations', () => {
-    expect(normalize(parsePublicApi([fixture('constants')]))).toMatchSnapshot()
+    expect(
+      _omitFilePath(parsePublicApi([fixture('constants')])),
+    ).toMatchSnapshot()
   })
 
   test('non-@public functions are not included', () => {
@@ -36,6 +43,26 @@ describe('parsePublicApi', () => {
     const { entries } = parsePublicApi([fixture('jsonifiable')])
     expect(entries).toHaveLength(1)
     expect(entries[0].name).toBe('serialize')
+  })
+
+  describe('@name tag', () => {
+    test('uses @name when present instead of the AST identifier', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_name')])
+      const fn = entries.find((e) => e.name === 'publicName')!
+      expect(fn).toBeDefined()
+      expect(fn.signature).toContain('publicName')
+    })
+
+    test('falls back to AST identifier when @name is absent', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_name')])
+      const fn = entries.find((e) => e.name === 'noAlias')!
+      expect(fn).toBeDefined()
+    })
+
+    test('no entry exists under the original AST name when @name overrides it', () => {
+      const { entries } = parsePublicApi([fixture('jsdoc_name')])
+      expect(entries.find((e) => e.name === '_internalName')).toBeUndefined()
+    })
   })
 
   describe('JSDoc type precedence over TypeScript types', () => {
