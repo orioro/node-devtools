@@ -21,7 +21,7 @@
     "prepublish": "npm run build",
     "build": "rm -rf dist && rollup --config ./rollup.config.mjs && chmod +x dist/cli.mjs",
     "test": "jest",
-    "dev:run": "yarn build && node dist/cli.mjs"
+    "dev:run": "yarn build && node dist/cli.mjs --todo"
   },
   "devDependencies": {
     "@orioro/dev": "workspace:^",

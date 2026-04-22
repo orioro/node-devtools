@@ -170,6 +170,28 @@ export function secondaryFunction() { ... }
 export function unorderedFunction() { ... }
 ```
 
+## TODO tracking
+
+Run with `--todo` to scan source files for TODO comments and write `TODO.md`.
+The file is removed automatically if no TODOs are found.
+
+```bash
+npm run readme -- --todo
+```
+
+Supported styles: `// TODO:`, `/* TODO: */`, and `@todo` JSDoc tags. Multi-line
+content is captured in full. Add `[readme-ignore]` anywhere in a comment to
+exclude it:
+
+```ts
+// TODO: fix the edge case
+// more context on next line
+
+/** @todo refactor this [readme-ignore] */
+```
+
+Output is a markdown checklist grouped by file, with source links.
+
 ## Configuration
 
 By default the CLI scans `src/**/*.{ts,tsx,js,jsx}` and reads `.README.md` from
@@ -186,12 +208,13 @@ export default (defaults) => ({
 
 Available options:
 
-| Option         | Default                    | Description               |
-| -------------- | -------------------------- | ------------------------- |
-| `templatePath` | `.README.md`               | Path to the template file |
-| `outputPath`   | `README.md`                | Path to write the output  |
-| `include`      | `src/**/*.{ts,tsx,js,jsx}` | Glob patterns to scan     |
-| `ignore`       | spec, test, d.ts, fixtures | Glob patterns to exclude  |
+| Option            | Default                    | Description                     |
+| ----------------- | -------------------------- | ------------------------------- |
+| `templatePath`    | `.README.md`               | Path to the template file       |
+| `outputPath`      | `README.md`                | Path to write the output        |
+| `todoOutputPath`  | `TODO.md`                  | Path to write the TODO output   |
+| `include`         | `src/**/*.{ts,tsx,js,jsx}` | Glob patterns to scan           |
+| `ignore`          | spec, test, d.ts, fixtures | Glob patterns to exclude        |
 
 ## API
 
@@ -201,7 +224,9 @@ Available options:
 
 **Render:** [`renderDocs`](#renderdocs)
 
-**Types:** [`Param`](#param) · [`PublicEntry`](#publicentry) · [`TypeDefinition`](#typedefinition) · [`ParseResult`](#parseresult)
+**General:** [`parseTodos`](#parsetodos) · [`renderTodos`](#rendertodos)
+
+**Types:** [`Param`](#param) · [`PublicEntry`](#publicentry) · [`TypeDefinition`](#typedefinition) · [`ParseResult`](#parseresult) · [`TodoEntry`](#todoentry)
 
 ## Parse
 
@@ -299,6 +324,46 @@ const docs = renderDocs(result)
 ```
 
 
+## General
+
+
+#### `parseTodos`
+
+[src/todos.ts#L148](src/todos.ts#L148)
+
+```ts
+function parseTodos(filePaths: string[]): TodoEntry[]
+```
+
+Scans source files for TODO comments (`// TODO:`, `/* TODO`, `@todo`)
+and returns a flat list of entries with their location. Multi-line content
+is captured in full for all comment types.
+
+**Parameters**
+
+- `filePaths` — `string[]` - absolute paths to source files to scan
+
+**Returns** `TodoEntry[]` — todo entries in source order, grouped by file
+
+#### `renderTodos`
+
+[src/todos.ts#L165](src/todos.ts#L165)
+
+```ts
+function renderTodos(todos: TodoEntry[]): string
+```
+
+Renders a list of `TodoEntry` items into a markdown TODO file, grouped by
+source file. Files with no TODOs are omitted. If the list is empty, returns
+a "No TODOs found" message.
+
+**Parameters**
+
+- `todos` — `TodoEntry[]` - entries returned by `parseTodos`
+
+**Returns** `string` — markdown string
+
+
 ## Types
 
 ### `Param`
@@ -357,5 +422,18 @@ export type TypeDefinition = {
 export type ParseResult = {
   entries: PublicEntry[]
   types: TypeDefinition[]
+}
+```
+
+### `TodoEntry`
+
+[src/todos.ts#L6](src/todos.ts#L6)
+
+```ts
+export type TodoEntry = {
+  text: string
+  filePath: string
+  relativeFilePath: string
+  line: number
 }
 ```
