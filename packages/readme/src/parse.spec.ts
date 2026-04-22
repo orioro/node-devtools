@@ -65,6 +65,37 @@ describe('parsePublicApi', () => {
     })
   })
 
+  describe('TypeDefinition.references', () => {
+    test('type that references other local types lists them in references', () => {
+      const { types } = parsePublicApi([fixture('typed')])
+      const userProfile = types.find((t) => t.name === 'UserProfile')!
+      expect(userProfile).toBeDefined()
+      expect(userProfile.references).toContain('Status')
+      expect(userProfile.references).toContain('Address')
+    })
+
+    test('leaf types with no local type references have empty references', () => {
+      const { types } = parsePublicApi([fixture('typed')])
+      const status = types.find((t) => t.name === 'Status')!
+      expect(status).toBeDefined()
+      expect(status.references).toEqual([])
+    })
+
+    test('array type notation UserProfile[] is still tracked as a reference to UserProfile', () => {
+      const { types } = parsePublicApi([fixture('typed')])
+      const userList = types.find((t) => t.name === 'UserList')!
+      expect(userList).toBeDefined()
+      expect(userList.references).toContain('UserProfile')
+    })
+
+    test('references contains no duplicates', () => {
+      const { types } = parsePublicApi([fixture('typed')])
+      const userProfile = types.find((t) => t.name === 'UserProfile')!
+      const unique = new Set(userProfile.references)
+      expect(userProfile.references.length).toBe(unique.size)
+    })
+  })
+
   describe('JSDoc type precedence over TypeScript types', () => {
     test('JSDoc @param {type} overrides TS-inferred param type', () => {
       const { entries } = parsePublicApi([fixture('jsdoc_types')])

@@ -152,8 +152,7 @@ export function parseTodos(filePaths: string[]): TodoEntry[] {
 
 /**
  * Renders a list of `TodoEntry` items into a markdown TODO file, grouped by
- * source file. Files with no TODOs are omitted. If the list is empty, returns
- * a "No TODOs found" message.
+ * source file. Files with no TODOs are omitted. If the list is empty, returns ""
  * @param todos - entries returned by `parseTodos`
  * @returns markdown string
  * @public

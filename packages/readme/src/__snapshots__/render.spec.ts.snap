@@ -292,15 +292,15 @@ exports[`renderDocs renders type definitions section before API for locally-defi
 
 
 
-**Functions:** [\`findUser\`](#finduser) · [\`updateUser\`](#updateuser)
+**Functions:** [\`findUser\`](#finduser) · [\`listUsers\`](#listusers) · [\`updateUser\`](#updateuser)
 
-**Types:** [\`Status\`](#status) · [\`Address\`](#address) · [\`UserProfile\`](#userprofile)
+**Types:** [\`Status\`](#status) · [\`Address\`](#address) · [\`UserProfile\`](#userprofile) · [\`UserList\`](#userlist)
 
 ## Functions
 
 ### \`findUser\`
 
-[src/__fixtures__/typed.ts#L21](src/__fixtures__/typed.ts#L21)
+[src/__fixtures__/typed.ts#L26](src/__fixtures__/typed.ts#L26)
 
 \`\`\`ts
 function findUser(id: string): UserProfile | null
@@ -314,9 +314,21 @@ Finds a user by id.
 
 **Returns** \`UserProfile | null\` — the matching user profile, or null if not found
 
+### \`listUsers\`
+
+[src/__fixtures__/typed.ts#L47](src/__fixtures__/typed.ts#L47)
+
+\`\`\`ts
+function listUsers(): UserList
+\`\`\`
+
+Lists all users.
+
+**Returns** [\`UserList\`](#userlist)
+
 ### \`updateUser\`
 
-[src/__fixtures__/typed.ts#L31](src/__fixtures__/typed.ts#L31)
+[src/__fixtures__/typed.ts#L36](src/__fixtures__/typed.ts#L36)
 
 \`\`\`ts
 function updateUser(id: string, patch: Partial<UserProfile>): UserProfile
@@ -342,6 +354,8 @@ Updates a user's profile fields.
 type Status = 'active' | 'inactive' | 'pending'
 \`\`\`
 
+**Used by:** [\`UserProfile\`](#userprofile)
+
 ### \`Address\`
 
 [src/__fixtures__/typed.ts#L3](src/__fixtures__/typed.ts#L3)
@@ -352,6 +366,8 @@ type Address = {
   city: string
 }
 \`\`\`
+
+**Used by:** [\`UserProfile\`](#userprofile)
 
 ### \`UserProfile\`
 
@@ -365,5 +381,20 @@ type UserProfile = {
   address: Address
 }
 \`\`\`
+
+**Used by:** [\`updateUser\`](#updateuser), [\`UserList\`](#userlist)
+
+### \`UserList\`
+
+[src/__fixtures__/typed.ts#L15](src/__fixtures__/typed.ts#L15)
+
+\`\`\`ts
+type UserList = {
+  items: UserProfile[]
+  total: number
+}
+\`\`\`
+
+**Used by:** [\`listUsers\`](#listusers)
 "
 `;

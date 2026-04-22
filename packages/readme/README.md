@@ -233,7 +233,7 @@ Available options:
 
 #### `parsePublicApi`
 
-[src/parse.ts#L445](src/parse.ts#L445)
+[src/parse.ts#L469](src/parse.ts#L469)
 
 ```ts
 function parsePublicApi(
@@ -283,7 +283,7 @@ target: ScriptTarget.ES2020,
 
 #### `renderDocs`
 
-[src/render.ts#L215](src/render.ts#L215)
+[src/render.ts#L267](src/render.ts#L267)
 
 ```ts
 function renderDocs(parseResult: ParseResult): string
@@ -343,19 +343,18 @@ is captured in full for all comment types.
 
 - `filePaths` — `string[]` - absolute paths to source files to scan
 
-**Returns** `TodoEntry[]` — todo entries in source order, grouped by file
+**Returns** [`TodoEntry[]`](#todoentry) — todo entries in source order, grouped by file
 
 #### `renderTodos`
 
-[src/todos.ts#L161](src/todos.ts#L161)
+[src/todos.ts#L160](src/todos.ts#L160)
 
 ```ts
 function renderTodos(todos: TodoEntry[]): string
 ```
 
 Renders a list of `TodoEntry` items into a markdown TODO file, grouped by
-source file. Files with no TODOs are omitted. If the list is empty, returns
-a "No TODOs found" message.
+source file. Files with no TODOs are omitted. If the list is empty, returns ""
 
 **Parameters**
 
@@ -368,7 +367,7 @@ a "No TODOs found" message.
 
 ### `Param`
 
-[src/parse.ts#L5](src/parse.ts#L5)
+[src/parse.ts#L3](src/parse.ts#L3)
 
 ```ts
 export type Param = {
@@ -379,9 +378,11 @@ export type Param = {
 }
 ```
 
+**Used by:** [`PublicEntry`](#publicentry)
+
 ### `PublicEntry`
 
-[src/parse.ts#L12](src/parse.ts#L12)
+[src/parse.ts#L10](src/parse.ts#L10)
 
 ```ts
 export type PublicEntry = {
@@ -395,28 +396,31 @@ export type PublicEntry = {
   examples: { name?: string; code: string }[]
   readmeConfig: Record<string, string>
   filePath: string
-  relativeFilePath: string
   line: number
 }
 ```
 
+**Used by:** [`ParseResult`](#parseresult)
+
 ### `TypeDefinition`
 
-[src/parse.ts#L27](src/parse.ts#L27)
+[src/parse.ts#L24](src/parse.ts#L24)
 
 ```ts
 export type TypeDefinition = {
   name: string
   text: string
+  references: string[]
   filePath: string
-  relativeFilePath: string
   line: number
 }
 ```
 
+**Used by:** [`ParseResult`](#parseresult)
+
 ### `ParseResult`
 
-[src/parse.ts#L35](src/parse.ts#L35)
+[src/parse.ts#L32](src/parse.ts#L32)
 
 ```ts
 export type ParseResult = {
@@ -424,6 +428,8 @@ export type ParseResult = {
   types: TypeDefinition[]
 }
 ```
+
+**Used by:** [`parsePublicApi`](#parsepublicapi), [`renderDocs`](#renderdocs)
 
 ### `TodoEntry`
 
@@ -437,3 +443,5 @@ export type TodoEntry = {
   line: number
 }
 ```
+
+**Used by:** [`parseTodos`](#parsetodos), [`renderTodos`](#rendertodos)
