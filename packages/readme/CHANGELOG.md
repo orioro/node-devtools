@@ -1,5 +1,11 @@
 # @orioro/readme
 
+## 2.3.1
+
+### Patch Changes
+
+- fix repeated todos on @todo jsdoc tag
+
 ## 2.3.0
 
 ### Minor Changes
