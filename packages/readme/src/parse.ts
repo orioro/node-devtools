@@ -1,6 +1,4 @@
 import * as ts from 'typescript'
-import { dirname, relative } from 'node:path'
-import { packageUpSync } from 'package-up'
 
 export type Param = {
   name: string
@@ -20,15 +18,14 @@ export type PublicEntry = {
   examples: { name?: string; code: string }[]
   readmeConfig: Record<string, string>
   filePath: string
-  relativeFilePath: string
   line: number
 }
 
 export type TypeDefinition = {
   name: string
   text: string
+  references: string[]
   filePath: string
-  relativeFilePath: string
   line: number
 }
 
@@ -194,6 +191,32 @@ function walkTypeRefs(
   )
 }
 
+function getDirectTypeRefNames(
+  node: ts.Node,
+  checker: ts.TypeChecker,
+  sourceFileNames: Set<string>,
+): string[] {
+  const names: string[] = []
+  function walk(n: ts.Node) {
+    if (ts.isTypeReferenceNode(n)) {
+      const type = checker.getTypeAtLocation(n)
+      const symbol = type.aliasSymbol ?? type.symbol
+      if (symbol) {
+        const isLocal = (symbol.declarations ?? []).some((d) =>
+          sourceFileNames.has(d.getSourceFile().fileName),
+        )
+        if (isLocal) {
+          const name = symbol.getName()
+          if (name !== '__type' && name !== '__object') names.push(name)
+        }
+      }
+    }
+    ts.forEachChild(n, walk)
+  }
+  walk(node)
+  return Array.from(new Set(names))
+}
+
 function collectTypeDefs(
   type: ts.Type,
   checker: ts.TypeChecker,
@@ -235,6 +258,7 @@ function collectTypeDefs(
       result.push({
         name: symbol.getName(),
         text: localDecl.getText().trim(),
+        references: getDirectTypeRefNames(localDecl, checker, sourceFileNames),
         filePath: localDecl.getSourceFile().fileName,
         line: getLine(localDecl),
       })
@@ -456,9 +480,6 @@ export function parsePublicApi(
   const sourceFileNames = new Set(filePaths)
   const rawEntries: RawEntry[] = []
 
-  const pkgPath = packageUpSync({ cwd: filePaths[0] })
-  const pkgRoot = pkgPath ? dirname(pkgPath) : process.cwd()
-
   for (const filePath of filePaths) {
     const sourceFile = program.getSourceFile(filePath)
     if (!sourceFile) continue
@@ -479,13 +500,7 @@ export function parsePublicApi(
   }
 
   return {
-    entries: rawEntries.map((r) => ({
-      ...r.entry,
-      relativeFilePath: relative(pkgRoot, r.entry.filePath),
-    })),
-    types: types.map((t) => ({
-      ...t,
-      relativeFilePath: relative(pkgRoot, t.filePath),
-    })),
+    entries: rawEntries.map((r) => r.entry),
+    types,
   }
 }

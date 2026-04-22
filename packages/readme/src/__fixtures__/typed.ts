@@ -12,6 +12,11 @@ type UserProfile = {
   address: Address
 }
 
+type UserList = {
+  items: UserProfile[]
+  total: number
+}
+
 /**
  * Finds a user by id.
  * @public
@@ -32,5 +37,13 @@ export function updateUser(
   id: string,
   patch: Partial<UserProfile>,
 ): UserProfile {
+  throw new Error('not implemented')
+}
+
+/**
+ * Lists all users.
+ * @public
+ */
+export function listUsers(): UserList {
   throw new Error('not implemented')
 }

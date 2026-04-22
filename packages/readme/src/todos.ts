@@ -116,19 +116,15 @@ function parseFileTodos(
   }
 
   // @todo [readme-ignore] JSDoc tags — TypeScript gives us multi-line tag content for free
+  const seenTagPos = new Set<number>()
   function visitForJsDoc(node: ts.Node) {
     for (const tag of ts.getJSDocTags(node)) {
-      if (tag.tagName.text.toLowerCase() === 'todo') {
-        const text = commentToText(tag.comment).trim().replace(/\r?\n/g, ' ')
-
-        if (text && !text.includes(IGNORE_MARKER))
-          todos.push({
-            text,
-            filePath,
-            relativeFilePath,
-            line: lineAt(tag.pos),
-          })
-      }
+      if (tag.tagName.text.toLowerCase() !== 'todo') continue
+      if (seenTagPos.has(tag.pos)) continue
+      seenTagPos.add(tag.pos)
+      const text = commentToText(tag.comment).trim().replace(/\r?\n/g, ' ')
+      if (text && !text.includes(IGNORE_MARKER))
+        todos.push({ text, filePath, relativeFilePath, line: lineAt(tag.pos) })
     }
     ts.forEachChild(node, visitForJsDoc)
   }
@@ -156,8 +152,7 @@ export function parseTodos(filePaths: string[]): TodoEntry[] {
 
 /**
  * Renders a list of `TodoEntry` items into a markdown TODO file, grouped by
- * source file. Files with no TODOs are omitted. If the list is empty, returns
- * a "No TODOs found" message.
+ * source file. Files with no TODOs are omitted. If the list is empty, returns ""
  * @param todos - entries returned by `parseTodos`
  * @returns markdown string
  * @public

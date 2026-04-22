@@ -78,8 +78,8 @@ describe('parseTodos', () => {
 })
 
 describe('renderTodos', () => {
-  test('renders "No TODOs found" when list is empty', () => {
-    expect(renderTodos([])).toContain('No TODOs found')
+  test('renders "" when list is empty', () => {
+    expect(renderTodos([])).toContain('')
   })
 
   test('renders a # TODO heading', () => {

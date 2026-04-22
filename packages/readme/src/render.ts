@@ -1,9 +1,13 @@
 import synchronizedPrettier from '@prettier/sync'
+import { dirname, relative } from 'node:path'
+import { packageUpSync } from 'package-up'
 import type { PublicEntry, TypeDefinition, ParseResult } from './parse.js'
 
 function sourceLink(relativeFilePath: string, line: number): string {
   return `[${relativeFilePath}#L${line}](${relativeFilePath}#L${line})`
 }
+
+const ARRAY_TYPE_NOTATION_RE = /\[\]$/
 
 const PRETTIER_OPTIONS = {
   parser: 'typescript',
@@ -108,6 +112,7 @@ function renderToc(
 function renderEntry(
   entry: PublicEntry,
   { types }: ParseResult,
+  pkgRoot: string,
   headingLevel = 3,
 ): string {
   const lines: string[] = []
@@ -116,7 +121,7 @@ function renderEntry(
 
   lines.push(`${h} \`${entry.name}\``)
   lines.push('')
-  lines.push(`${sourceLink(entry.relativeFilePath, entry.line)}`)
+  lines.push(`${sourceLink(relative(pkgRoot, entry.filePath), entry.line)}`)
   lines.push('')
   lines.push('```ts')
   lines.push(formatSignature(entry.signature))
@@ -146,7 +151,9 @@ function renderEntry(
     lines.push('')
     const desc = entry.returnDescription ? ` — ${entry.returnDescription}` : ''
 
-    const typeText = definedTypeNames.includes(entry.returnType)
+    const typeText = definedTypeNames.includes(
+      entry.returnType.replace(ARRAY_TYPE_NOTATION_RE, ''),
+    )
       ? `[\`${entry.returnType}\`](#${toAnchor(entry.returnType)})`
       : `\`${entry.returnType}\``
 
@@ -166,7 +173,43 @@ function renderEntry(
   return lines.join('\n')
 }
 
-function renderTypes(types: TypeDefinition[]): string {
+function buildTypeUsageIndex(
+  entries: PublicEntry[],
+  types: TypeDefinition[],
+): Record<string, string[]> {
+  const definedTypeNames = new Set(types.map((t) => t.name))
+  const index: Record<string, string[]> = {}
+
+  function addUsage(typeName: string, usedBy: string) {
+    if (!index[typeName]) index[typeName] = []
+    if (!index[typeName].includes(usedBy)) index[typeName].push(usedBy)
+  }
+
+  for (const entry of entries) {
+    for (const param of entry.params) {
+      const base = param.type.replace(ARRAY_TYPE_NOTATION_RE, '')
+      if (definedTypeNames.has(base)) addUsage(base, entry.name)
+    }
+    if (entry.returnType) {
+      const base = entry.returnType.replace(ARRAY_TYPE_NOTATION_RE, '')
+      if (definedTypeNames.has(base)) addUsage(base, entry.name)
+    }
+  }
+
+  for (const type of types) {
+    for (const ref of type.references) {
+      if (definedTypeNames.has(ref)) addUsage(ref, type.name)
+    }
+  }
+
+  return index
+}
+
+function renderTypes(
+  types: TypeDefinition[],
+  usageIndex: Record<string, string[]>,
+  pkgRoot: string,
+): string {
   if (types.length === 0) return ''
 
   const lines: string[] = ['## Types', '']
@@ -174,11 +217,20 @@ function renderTypes(types: TypeDefinition[]): string {
   for (const t of types) {
     lines.push(`### \`${t.name}\``)
     lines.push('')
-    lines.push(`${sourceLink(t.relativeFilePath, t.line)}`)
+    lines.push(`${sourceLink(relative(pkgRoot, t.filePath), t.line)}`)
     lines.push('')
     lines.push('```ts')
     lines.push(formatSignature(t.text))
     lines.push('```')
+
+    const usedBy = usageIndex[t.name]
+    if (usedBy && usedBy.length > 0) {
+      lines.push('')
+      lines.push(
+        `**Used by:** ${usedBy.map((n) => `[\`${n}\`](#${toAnchor(n)})`).join(', ')}`,
+      )
+    }
+
     lines.push('')
   }
 
@@ -217,6 +269,12 @@ export function renderDocs(parseResult: ParseResult): string {
 
   if (entries.length === 0) return ''
 
+  const firstFilePath = entries[0]?.filePath ?? types[0]?.filePath
+  const pkgPath = firstFilePath
+    ? packageUpSync({ cwd: dirname(firstFilePath) })
+    : undefined
+  const pkgRoot = pkgPath ? dirname(pkgPath) : process.cwd()
+
   const ordered = [...entries].sort((a, b) => {
     const aOrder = a.readmeConfig.order
     const bOrder = b.readmeConfig.order
@@ -253,7 +311,7 @@ export function renderDocs(parseResult: ParseResult): string {
           ...(catHasMultipleTypes ? [`### ${section}`, ''] : ['']),
         )
         for (const entry of sectionEntries) {
-          categoryLines.push(renderEntry(entry, parseResult, 4))
+          categoryLines.push(renderEntry(entry, parseResult, pkgRoot, 4))
           categoryLines.push('')
         }
       }
@@ -266,14 +324,15 @@ export function renderDocs(parseResult: ParseResult): string {
     for (const { label, entries: sectionEntries } of grouped) {
       const sectionLines: string[] = [`## ${label}`, '']
       for (const entry of sectionEntries) {
-        sectionLines.push(renderEntry(entry, parseResult))
+        sectionLines.push(renderEntry(entry, parseResult, pkgRoot))
         sectionLines.push('')
       }
       docSections.push(sectionLines.join('\n'))
     }
   }
 
-  const typesSection = renderTypes(types)
+  const usageIndex = buildTypeUsageIndex(ordered, types)
+  const typesSection = renderTypes(types, usageIndex, pkgRoot)
   if (typesSection) docSections.push(typesSection)
 
   return docSections.join('\n\n')
