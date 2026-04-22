@@ -1,9 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renderDocs examples preserves multi-line content within each example block 1`] = `
-"**API:** [\`format\`](#format)
+"## API
 
-## API
+
+
+**Functions:** [\`format\`](#format)
+
+## Functions
 
 ### \`format\`
 
@@ -54,9 +58,13 @@ console.log(greet('Bob'))
 `;
 
 exports[`renderDocs examples renders multiple examples each wrapped in a ts code block 1`] = `
-"**API:** [\`format\`](#format)
+"## API
 
-## API
+
+
+**Functions:** [\`format\`](#format)
+
+## Functions
 
 ### \`format\`
 
@@ -107,9 +115,13 @@ console.log(greet('Bob'))
 `;
 
 exports[`renderDocs renders basic function 1`] = `
-"**API:** [\`add\`](#add)
+"## API
 
-## API
+
+
+**Functions:** [\`add\`](#add)
+
+## Functions
 
 ### \`add\`
 
@@ -137,21 +149,17 @@ add(1, 2) // 3
 `;
 
 exports[`renderDocs renders complex types, arrow functions, and classes 1`] = `
-"**API:** [\`Greeter\`](#greeter) · [\`fetchUser\`](#fetchuser) · [\`greet\`](#greet)
+"## API
+
+
+
+**Functions:** [\`fetchUser\`](#fetchuser) · [\`greet\`](#greet)
+
+**Classes:** [\`Greeter\`](#greeter)
 
 **Types:** [\`Result\`](#result)
 
-## API
-
-### \`Greeter\`
-
-[src/__fixtures__/complex.ts#L28](src/__fixtures__/complex.ts#L28)
-
-\`\`\`ts
-class Greeter
-\`\`\`
-
-A simple class.
+## Functions
 
 ### \`fetchUser\`
 
@@ -190,6 +198,19 @@ function greet(name: string): string
 **Returns** \`string\`
 
 
+## Classes
+
+### \`Greeter\`
+
+[src/__fixtures__/complex.ts#L28](src/__fixtures__/complex.ts#L28)
+
+\`\`\`ts
+class Greeter
+\`\`\`
+
+A simple class.
+
+
 ## Types
 
 ### \`Result\`
@@ -203,11 +224,15 @@ type Result<T> = { data: T; error: null } | { data: null; error: string }
 `;
 
 exports[`renderDocs renders constants with inferred and annotated types 1`] = `
-"**API:** [\`DEFAULT_CONFIG\`](#defaultconfig) · [\`DEFAULT_LOG_LEVEL\`](#defaultloglevel) · [\`MAX_RETRIES\`](#maxretries) · [\`VERSION\`](#version)
+"## API
+
+
+
+**Constants:** [\`DEFAULT_CONFIG\`](#defaultconfig) · [\`DEFAULT_LOG_LEVEL\`](#defaultloglevel) · [\`MAX_RETRIES\`](#maxretries) · [\`VERSION\`](#version)
 
 **Types:** [\`LogLevel\`](#loglevel)
 
-## API
+## Constants
 
 ### \`DEFAULT_CONFIG\`
 
@@ -263,11 +288,15 @@ type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 `;
 
 exports[`renderDocs renders type definitions section before API for locally-defined types 1`] = `
-"**API:** [\`findUser\`](#finduser) · [\`updateUser\`](#updateuser)
+"## API
+
+
+
+**Functions:** [\`findUser\`](#finduser) · [\`updateUser\`](#updateuser)
 
 **Types:** [\`Status\`](#status) · [\`Address\`](#address) · [\`UserProfile\`](#userprofile)
 
-## API
+## Functions
 
 ### \`findUser\`
 

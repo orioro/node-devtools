@@ -26,12 +26,45 @@ function toAnchor(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
-function renderToc(types: TypeDefinition[], entries: PublicEntry[]): string {
-  const lines: string[] = []
+const BUILTIN_SECTIONS = ['Functions', 'Classes', 'Constants']
 
-  if (entries.length > 0) {
+const BUILTIN_SECTION_MAP: Record<string, string> = {
+  function: 'Functions',
+  class: 'Classes',
+  constant: 'Constants',
+}
+
+function getSectionName(entry: PublicEntry): string {
+  return (
+    entry.readmeConfig.kind ?? BUILTIN_SECTION_MAP[entry.kind] ?? 'Functions'
+  )
+}
+
+type SectionGroup = { section: string; entries: PublicEntry[] }
+
+function groupBySection(entries: PublicEntry[]): SectionGroup[] {
+  const map: Record<string, PublicEntry[]> = {}
+  for (const entry of entries) {
+    const section = getSectionName(entry)
+    if (!map[section]) map[section] = []
+    map[section].push(entry)
+  }
+  const custom = Object.keys(map).filter((k) => !BUILTIN_SECTIONS.includes(k))
+  const builtin = BUILTIN_SECTIONS.filter(
+    (k) => Array.isArray(map[k]) && map[k].length > 0,
+  )
+  return [...custom, ...builtin].map((section) => ({
+    section,
+    entries: map[section],
+  }))
+}
+
+function renderToc(types: TypeDefinition[], groups: SectionGroup[]): string {
+  const lines: string[] = ['## API', '']
+
+  for (const { section, entries } of groups) {
     lines.push(
-      '**API:** ' +
+      `**${section}:** ` +
         entries.map((e) => `[\`${e.name}\`](#${toAnchor(e.name)})`).join(' · '),
     )
   }
@@ -139,19 +172,22 @@ export function renderDocs(parseResult: ParseResult): string {
     return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
   })
 
-  const sections: string[] = []
+  const grouped = groupBySection(ordered)
+  const docSections: string[] = []
 
-  sections.push(renderToc(types, ordered))
+  docSections.push(renderToc(types, grouped))
 
-  const apiLines: string[] = ['## API', '']
-  for (const entry of ordered) {
-    apiLines.push(renderEntry(entry, parseResult))
-    apiLines.push('')
+  for (const { section, entries: sectionEntries } of grouped) {
+    const sectionLines: string[] = [`## ${section}`, '']
+    for (const entry of sectionEntries) {
+      sectionLines.push(renderEntry(entry, parseResult))
+      sectionLines.push('')
+    }
+    docSections.push(sectionLines.join('\n'))
   }
-  sections.push(apiLines.join('\n'))
 
   const typesSection = renderTypes(types)
-  if (typesSection) sections.push(typesSection)
+  if (typesSection) docSections.push(typesSection)
 
-  return sections.join('\n\n')
+  return docSections.join('\n\n')
 }

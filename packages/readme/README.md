@@ -85,6 +85,46 @@ Examples without a `<caption>` are numbered automatically (`Example 1`,
 
 Controls rendering options via space-separated `key=value` pairs.
 
+#### `kind`
+
+Overrides the section an entry is grouped under in the rendered output. By
+default, functions appear under **Functions**, classes under **Classes**, and
+exported constants under **Constants**. Use `kind` to place an entry in a
+custom section — the value becomes the section heading.
+
+This is particularly useful for React projects where components should be
+documented separately:
+
+```ts
+/**
+ * A button component.
+ * @public
+ * @readme kind=Components
+ */
+export function Button({ label }: ButtonProps) {
+  return <button>{label}</button>
+}
+
+/**
+ * A modal component.
+ * @public
+ * @readme kind=Components
+ */
+export function Modal({ children }: ModalProps) {
+  return <dialog>{children}</dialog>
+}
+
+/**
+ * A utility function.
+ * @public
+ */
+export function formatDate(date: Date): string { ... }
+```
+
+This produces two separate sections — **Components** and **Functions** — with
+Components listed first. You can use any string: `Hooks`, `Utilities`,
+`Guards`, etc.
+
 #### `order`
 
 Sets the position of the entry in the rendered output. Entries with an explicit
@@ -133,11 +173,15 @@ Available options:
 | `include`      | `src/**/*.{ts,tsx,js,jsx}` | Glob patterns to scan     |
 | `ignore`       | spec, test, d.ts, fixtures | Glob patterns to exclude  |
 
-**API:** [`parsePublicApi`](#parsepublicapi) · [`renderDocs`](#renderdocs)
+## API
+
+
+
+**Functions:** [`parsePublicApi`](#parsepublicapi) · [`renderDocs`](#renderdocs)
 
 **Types:** [`Param`](#param) · [`PublicEntry`](#publicentry) · [`TypeDefinition`](#typedefinition) · [`ParseResult`](#parseresult)
 
-## API
+## Functions
 
 ### `parsePublicApi`
 
@@ -165,7 +209,7 @@ alongside the entries in dependency order.
 
 ### `renderDocs`
 
-[src/render.ts#L125](src/render.ts#L125)
+[src/render.ts#L158](src/render.ts#L158)
 
 ```ts
 function renderDocs(parseResult: ParseResult): string
