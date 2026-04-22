@@ -76,15 +76,20 @@ function getReadmeConfig(node: ts.Node): Record<string, string> {
   const tag = getJsDocTags(node).get('readme')?.[0]
   if (!tag) return {}
   return Object.fromEntries(
-    tag.split(/\s+/)
+    tag
+      .split(/\s+/)
       .filter((pair) => pair.includes('='))
-      .map((pair) => pair.split('=') as [string, string])
+      .map((pair) => pair.split('=') as [string, string]),
   )
 }
 
 function parseExample(raw: string): { name?: string; code: string } {
   const caption = raw.match(/^<caption>(.*?)<\/caption>\n?/)
-  if (caption) return { name: caption[1].trim(), code: raw.slice(caption[0].length).trim() }
+  if (caption)
+    return {
+      name: caption[1].trim(),
+      code: raw.slice(caption[0].length).trim(),
+    }
   return { code: raw.trim() }
 }
 
@@ -105,7 +110,8 @@ function getName(node: ts.Node): string | undefined {
   if (tags.get('name')?.[0]) return tags.get('name')![0]
   if (ts.isFunctionDeclaration(node) && node.name) return node.name.text
   if (ts.isClassDeclaration(node) && node.name) return node.name.text
-  if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) return node.name.text
+  if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name))
+    return node.name.text
   return undefined
 }
 
@@ -141,7 +147,10 @@ function getParamTypes(node: ts.Node): Map<string, string> {
   return map
 }
 
-function getReturnTypeStr(node: ts.FunctionLikeDeclaration, checker: ts.TypeChecker): string {
+function getReturnTypeStr(
+  node: ts.FunctionLikeDeclaration,
+  checker: ts.TypeChecker,
+): string {
   for (const doc of getJsDocs(node)) {
     for (const tag of doc.tags ?? []) {
       if (ts.isJSDocReturnTag(tag) && tag.typeExpression) {
@@ -203,7 +212,8 @@ function collectTypeDefs(
     seen.add(symbol)
 
     // Skip anonymous/synthetic types and generic type parameters (T, K, V …)
-    const isAnonymous = symbol.getName() === '__type' || symbol.getName() === '__object'
+    const isAnonymous =
+      symbol.getName() === '__type' || symbol.getName() === '__object'
     const isTypeParam = !!(symbol.flags & ts.SymbolFlags.TypeParameter)
     if (isAnonymous || isTypeParam) return
 
@@ -213,7 +223,14 @@ function collectTypeDefs(
 
     if (localDecl) {
       // Recurse into this declaration first → dependencies output before dependents
-      walkTypeRefs(localDecl, checker, sourceFileNames, seen, result, visitedTypes)
+      walkTypeRefs(
+        localDecl,
+        checker,
+        sourceFileNames,
+        seen,
+        result,
+        visitedTypes,
+      )
 
       result.push({
         name: symbol.getName(),
@@ -228,8 +245,7 @@ function collectTypeDefs(
   // For generic instantiations (e.g. Promise<User>, Partial<User>), recurse
   // into the type arguments even if the outer type isn't local
   const typeArgs =
-    (type as ts.TypeReference).typeArguments ??
-    type.aliasTypeArguments
+    (type as ts.TypeReference).typeArguments ?? type.aliasTypeArguments
 
   for (const arg of typeArgs ?? []) {
     collectTypeDefs(arg, checker, sourceFileNames, seen, result, visitedTypes)
@@ -272,7 +288,11 @@ function extractConstant(
   }
 }
 
-function buildSignature(name: string, params: Param[], returnType: string): string {
+function buildSignature(
+  name: string,
+  params: Param[],
+  returnType: string,
+): string {
   const paramStr = params
     .map((p) => `${p.name}${p.optional ? '?' : ''}: ${p.type}`)
     .join(', ')
@@ -349,7 +369,9 @@ function visitNode(
   }
 
   if (ts.isFunctionDeclaration(node) && node.name) {
-    rawEntries.push(extractFromFunctionLike(node, getName(node)!, checker, filePath))
+    rawEntries.push(
+      extractFromFunctionLike(node, getName(node)!, checker, filePath),
+    )
     return
   }
 
@@ -398,10 +420,12 @@ function visitNode(
  * Parameter types and return types are resolved from the TypeScript type
  * checker. Referenced local type definitions are collected and returned
  * alongside the entries in dependency order.
- * @public
  * @param filePaths - absolute paths to source files to parse
  * @param compilerOptions - optional TypeScript compiler options override
  * @returns parsed entries and referenced local type definitions
+ *
+ * @readme category=Parse
+ * @public
  */
 export function parsePublicApi(
   filePaths: string[],

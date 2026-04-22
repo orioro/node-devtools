@@ -26,6 +26,59 @@ describe('renderDocs', () => {
     expect(renderDocs(parsePublicApi([fixture('typed')]))).toMatchSnapshot()
   })
 
+  describe('categories', () => {
+    test('renders a ## heading for each category', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      expect(rendered).toContain('## Auth')
+      expect(rendered).toContain('## Utility')
+      expect(rendered).toContain('## General')
+    })
+
+    test('categories are sorted alphabetically with General last', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      const authPos = rendered.indexOf('## Auth')
+      const utilityPos = rendered.indexOf('## Utility')
+      const generalPos = rendered.indexOf('## General')
+      expect(authPos).toBeLessThan(utilityPos)
+      expect(utilityPos).toBeLessThan(generalPos)
+    })
+
+    test('renders section sub-headings within each category', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      const authSection = rendered.slice(rendered.indexOf('## Auth'), rendered.indexOf('## Utility'))
+      expect(authSection).toContain('### Functions')
+      expect(authSection).toContain('### Components')
+    })
+
+    test('entry headings are #### when categories are in use', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      expect(rendered).toContain('#### `login`')
+      expect(rendered).toContain('#### `logout`')
+      expect(rendered).toContain('#### `noop`')
+    })
+
+    test('custom kind=Components groups entry under Components section', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      const authSection = rendered.slice(rendered.indexOf('## Auth'), rendered.indexOf('## Utility'))
+      const componentsSection = authSection.slice(authSection.indexOf('### Components'))
+      expect(componentsSection).toContain('#### `Button`')
+    })
+
+    test('uncategorized entries fall into General', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      const generalSection = rendered.slice(rendered.indexOf('## General'))
+      expect(generalSection).toContain('#### `noop`')
+    })
+
+    test('TOC lists entries grouped by category', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('categories')]))
+      const toc = rendered.slice(0, rendered.indexOf('## Auth'))
+      expect(toc).toContain('**Auth:**')
+      expect(toc).toContain('**Utility:**')
+      expect(toc).toContain('**General:**')
+    })
+  })
+
   describe('ordering', () => {
     const getOrder = (rendered: string) =>
       [...rendered.matchAll(/### `(\w+)`/g)].map((m) => m[1])

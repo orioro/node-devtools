@@ -34,37 +34,63 @@ const BUILTIN_SECTION_MAP: Record<string, string> = {
   constant: 'Constants',
 }
 
-function getSectionName(entry: PublicEntry): string {
-  return (
-    entry.readmeConfig.kind ?? BUILTIN_SECTION_MAP[entry.kind] ?? 'Functions'
-  )
+const DEFAULT_CATEGORY = 'General'
+
+function _groupBy(
+  items: PublicEntry[],
+  getKey: (item: PublicEntry) => string,
+): Record<string, PublicEntry[]> {
+  const result: Record<string, PublicEntry[]> = {}
+  for (const item of items) {
+    const key = getKey(item)
+    if (!result[key]) result[key] = []
+    result[key].push(item)
+  }
+  return result
 }
 
-type SectionGroup = { section: string; entries: PublicEntry[] }
-
-function groupBySection(entries: PublicEntry[]): SectionGroup[] {
-  const map: Record<string, PublicEntry[]> = {}
-  for (const entry of entries) {
-    const section = getSectionName(entry)
-    if (!map[section]) map[section] = []
-    map[section].push(entry)
-  }
-  const custom = Object.keys(map).filter((k) => !BUILTIN_SECTIONS.includes(k))
-  const builtin = BUILTIN_SECTIONS.filter(
-    (k) => Array.isArray(map[k]) && map[k].length > 0,
+function groupBySection(
+  entries: PublicEntry[],
+): { label: string; entries: PublicEntry[] }[] {
+  const map = _groupBy(
+    entries,
+    (e) => e.readmeConfig.kind ?? BUILTIN_SECTION_MAP[e.kind] ?? 'Functions',
   )
-  return [...custom, ...builtin].map((section) => ({
-    section,
-    entries: map[section],
+  const custom = Object.keys(map).filter((k) => !BUILTIN_SECTIONS.includes(k))
+  const builtin = BUILTIN_SECTIONS.filter((k) => map[k])
+  return [...custom, ...builtin].map((label) => ({
+    label,
+    entries: map[label],
   }))
 }
 
-function renderToc(types: TypeDefinition[], groups: SectionGroup[]): string {
+function groupByCategory(
+  entries: PublicEntry[],
+): { label: string; sections: { label: string; entries: PublicEntry[] }[] }[] {
+  const withDefaults = entries.map((e) => ({
+    ...e,
+    readmeConfig: {
+      ...e.readmeConfig,
+      category: e.readmeConfig.category ?? DEFAULT_CATEGORY,
+    },
+  }))
+  const map = _groupBy(withDefaults, (e) => e.readmeConfig.category!)
+  const named = Object.keys(map)
+    .filter((k) => k !== DEFAULT_CATEGORY)
+    .sort()
+  const keys = map[DEFAULT_CATEGORY] ? [...named, DEFAULT_CATEGORY] : named
+  return keys.map((label) => ({ label, sections: groupBySection(map[label]) }))
+}
+
+function renderToc(
+  types: TypeDefinition[],
+  groups: { label: string; entries: PublicEntry[] }[],
+): string {
   const lines: string[] = ['## API', '']
 
-  for (const { section, entries } of groups) {
+  for (const { label, entries } of groups) {
     lines.push(
-      `**${section}:** ` +
+      `**${label}:** ` +
         entries.map((e) => `[\`${e.name}\`](#${toAnchor(e.name)})`).join(' · '),
     )
   }
@@ -79,11 +105,16 @@ function renderToc(types: TypeDefinition[], groups: SectionGroup[]): string {
   return lines.join('\n\n')
 }
 
-function renderEntry(entry: PublicEntry, { types }: ParseResult): string {
+function renderEntry(
+  entry: PublicEntry,
+  { types }: ParseResult,
+  headingLevel = 3,
+): string {
   const lines: string[] = []
   const definedTypeNames = types.map((t) => t.name)
+  const h = '#'.repeat(headingLevel)
 
-  lines.push(`### \`${entry.name}\``)
+  lines.push(`${h} \`${entry.name}\``)
   lines.push('')
   lines.push(`${sourceLink(entry.relativeFilePath, entry.line)}`)
   lines.push('')
@@ -154,7 +185,10 @@ function renderTypes(types: TypeDefinition[]): string {
   return lines.join('\n')
 }
 
-/** @public */
+/**
+ * @readme category=Render
+ * @public
+ */
 export function renderDocs(parseResult: ParseResult): string {
   const { entries, types } = parseResult
 
@@ -172,18 +206,48 @@ export function renderDocs(parseResult: ParseResult): string {
     return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
   })
 
-  const grouped = groupBySection(ordered)
+  const hasCategories = ordered.some((e) => e.readmeConfig.category)
   const docSections: string[] = []
 
-  docSections.push(renderToc(types, grouped))
+  if (hasCategories) {
+    const categories = groupByCategory(ordered)
+    const tocGroups = categories.map(({ label, sections }) => ({
+      label,
+      entries: sections.reduce(
+        (acc: PublicEntry[], s) => acc.concat(s.entries),
+        [],
+      ),
+    }))
+    docSections.push(renderToc(types, tocGroups))
 
-  for (const { section, entries: sectionEntries } of grouped) {
-    const sectionLines: string[] = [`## ${section}`, '']
-    for (const entry of sectionEntries) {
-      sectionLines.push(renderEntry(entry, parseResult))
-      sectionLines.push('')
+    for (const { label: category, sections } of categories) {
+      const categoryLines: string[] = [`## ${category}`, '']
+
+      const catHasMultipleTypes = Object.keys(sections).length > 1
+
+      for (const { label: section, entries: sectionEntries } of sections) {
+        categoryLines.push(
+          ...(catHasMultipleTypes ? [`### ${section}`, ''] : ['']),
+        )
+        for (const entry of sectionEntries) {
+          categoryLines.push(renderEntry(entry, parseResult, 4))
+          categoryLines.push('')
+        }
+      }
+      docSections.push(categoryLines.join('\n'))
     }
-    docSections.push(sectionLines.join('\n'))
+  } else {
+    const grouped = groupBySection(ordered)
+    docSections.push(renderToc(types, grouped))
+
+    for (const { label, entries: sectionEntries } of grouped) {
+      const sectionLines: string[] = [`## ${label}`, '']
+      for (const entry of sectionEntries) {
+        sectionLines.push(renderEntry(entry, parseResult))
+        sectionLines.push('')
+      }
+      docSections.push(sectionLines.join('\n'))
+    }
   }
 
   const typesSection = renderTypes(types)

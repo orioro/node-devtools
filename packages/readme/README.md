@@ -125,6 +125,26 @@ This produces two separate sections — **Components** and **Functions** — wit
 Components listed first. You can use any string: `Hooks`, `Utilities`,
 `Guards`, etc.
 
+#### `category`
+
+Groups entries into top-level categories, producing a two-level structure
+(`## Category` → `### Functions/Classes/Constants` → `#### entry`). Categories
+are sorted alphabetically. Entries without a category fall into **General**,
+which always appears last.
+
+Can be combined with `kind`:
+
+```ts
+/** @public @readme category=Auth */
+export function login(): void { ... }
+
+/** @public @readme category=Auth kind=Components */
+export function LoginForm(): JSX.Element { ... }
+
+/** @public @readme category=Utility */
+export function formatDate(date: Date): string { ... }
+```
+
 #### `order`
 
 Sets the position of the entry in the rendered output. Entries with an explicit
@@ -177,15 +197,18 @@ Available options:
 
 
 
-**Functions:** [`parsePublicApi`](#parsepublicapi) · [`renderDocs`](#renderdocs)
+**Parse:** [`parsePublicApi`](#parsepublicapi)
+
+**Render:** [`renderDocs`](#renderdocs)
 
 **Types:** [`Param`](#param) · [`PublicEntry`](#publicentry) · [`TypeDefinition`](#typedefinition) · [`ParseResult`](#parseresult)
 
-## Functions
+## Parse
 
-### `parsePublicApi`
 
-[src/parse.ts#L406](src/parse.ts#L406)
+#### `parsePublicApi`
+
+[src/parse.ts#L430](src/parse.ts#L430)
 
 ```ts
 function parsePublicApi(
@@ -207,9 +230,13 @@ alongside the entries in dependency order.
 
 **Returns** [`ParseResult`](#parseresult) — parsed entries and referenced local type definitions
 
-### `renderDocs`
 
-[src/render.ts#L158](src/render.ts#L158)
+## Render
+
+
+#### `renderDocs`
+
+[src/render.ts#L192](src/render.ts#L192)
 
 ```ts
 function renderDocs(parseResult: ParseResult): string
