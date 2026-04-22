@@ -1,6 +1,6 @@
 {
   "name": "@orioro/readme",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "main": "dist/index.mjs",
