@@ -152,16 +152,16 @@ function renderEntry(
 
     lines.push(`**Returns** ${typeText}${desc}`)
   }
-
-  for (const [i, example] of entry.examples.entries()) {
+  entry.examples.forEach((example, i) => {
     const label = example.name ? `Example: ${example.name}` : `Example ${i + 1}`
+
     lines.push('')
     lines.push(`**${label}**`)
     lines.push('')
     lines.push('```ts')
     lines.push(example.code)
     lines.push('```')
-  }
+  })
 
   return lines.join('\n')
 }
@@ -186,6 +186,29 @@ function renderTypes(types: TypeDefinition[]): string {
 }
 
 /**
+ * Renders a `ParseResult` into a markdown string. Entries are grouped into
+ * sections by kind (`Functions`, `Classes`, `Constants`) and optionally into
+ * top-level categories via `@readme category=`. Within each group, entries are
+ * sorted by `@readme order=` first, then alphabetically.
+ * @param parseResult - the result of `parsePublicApi`
+ * @returns markdown string ready to be appended to a README template
+ *
+ * @example <caption>Render and write README</caption>
+ * import { parsePublicApi, renderDocs } from '@orioro/readme'
+ * import { readFileSync, writeFileSync } from 'node:fs'
+ *
+ * const result = parsePublicApi(files)
+ * const docs = renderDocs(result)
+ * const template = readFileSync('.README.md', 'utf8')
+ * writeFileSync('README.md', `${template.trimEnd()}\n\n${docs}`)
+ *
+ * @example <caption>Filter entries before rendering</caption>
+ * const result = parsePublicApi(files)
+ *
+ * // Only document functions, skip constants
+ * result.entries = result.entries.filter((e) => e.kind === 'function')
+ *
+ * const docs = renderDocs(result)
  * @readme category=Render
  * @public
  */

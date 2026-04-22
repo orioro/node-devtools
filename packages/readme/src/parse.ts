@@ -424,6 +424,21 @@ function visitNode(
  * @param compilerOptions - optional TypeScript compiler options override
  * @returns parsed entries and referenced local type definitions
  *
+ * @example <caption>Basic usage</caption>
+ * import { parsePublicApi } from '@orioro/readme'
+ * import { resolve } from 'node:path'
+ * import fg from 'fast-glob'
+ *
+ * const files = await fg('src/**\/*.ts', { absolute: true })
+ * const result = parsePublicApi(files.map((f) => resolve(f)))
+ *
+ * @example <caption>Custom compiler options</caption>
+ * import { ScriptTarget } from 'typescript'
+ *
+ * const result = parsePublicApi(files, {
+ *   strict: false,
+ *   target: ScriptTarget.ES2020,
+ * })
  * @readme category=Parse
  * @public
  */

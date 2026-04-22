@@ -208,7 +208,7 @@ Available options:
 
 #### `parsePublicApi`
 
-[src/parse.ts#L430](src/parse.ts#L430)
+[src/parse.ts#L445](src/parse.ts#L445)
 
 ```ts
 function parsePublicApi(
@@ -230,23 +230,73 @@ alongside the entries in dependency order.
 
 **Returns** [`ParseResult`](#parseresult) — parsed entries and referenced local type definitions
 
+**Example: Basic usage**
+
+```ts
+import { parsePublicApi } from '@orioro/readme'
+import { resolve } from 'node:path'
+import fg from 'fast-glob'
+
+const files = await fg('src/**\/*.ts', { absolute: true })
+const result = parsePublicApi(files.map((f) => resolve(f)))
+```
+
+**Example: Custom compiler options**
+
+```ts
+import { ScriptTarget } from 'typescript'
+
+const result = parsePublicApi(files, {
+strict: false,
+target: ScriptTarget.ES2020,
+})
+```
+
 
 ## Render
 
 
 #### `renderDocs`
 
-[src/render.ts#L192](src/render.ts#L192)
+[src/render.ts#L215](src/render.ts#L215)
 
 ```ts
 function renderDocs(parseResult: ParseResult): string
 ```
 
+Renders a `ParseResult` into a markdown string. Entries are grouped into
+sections by kind (`Functions`, `Classes`, `Constants`) and optionally into
+top-level categories via `@readme category=`. Within each group, entries are
+sorted by `@readme order=` first, then alphabetically.
+
 **Parameters**
 
-- `parseResult` — [`ParseResult`](#parseresult)
+- `parseResult` — [`ParseResult`](#parseresult) - the result of `parsePublicApi`
 
-**Returns** `string`
+**Returns** `string` — markdown string ready to be appended to a README template
+
+**Example: Render and write README**
+
+```ts
+import { parsePublicApi, renderDocs } from '@orioro/readme'
+import { readFileSync, writeFileSync } from 'node:fs'
+
+const result = parsePublicApi(files)
+const docs = renderDocs(result)
+const template = readFileSync('.README.md', 'utf8')
+writeFileSync('README.md', `${template.trimEnd()}\n\n${docs}`)
+```
+
+**Example: Filter entries before rendering**
+
+```ts
+const result = parsePublicApi(files)
+
+// Only document functions, skip constants
+result.entries = result.entries.filter((e) => e.kind === 'function')
+
+const docs = renderDocs(result)
+```
 
 
 ## Types
