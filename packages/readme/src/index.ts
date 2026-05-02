@@ -1,3 +1,3 @@
-export { parsePublicApi } from './parse.js'
-export { renderDocs } from './render.js'
-export type { PublicEntry, Param, TypeDefinition, ParseResult } from './parse.js'
+export { parsePublicApi } from './parse'
+export { renderDocs } from './render'
+export type { PublicEntry, Param, TypeDefinition, ParseResult } from './parse'

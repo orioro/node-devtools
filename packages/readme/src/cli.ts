@@ -2,9 +2,9 @@
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import fg from 'fast-glob'
-import { parsePublicApi } from './parse.js'
-import { renderDocs } from './render.js'
-import { parseTodos, renderTodos } from './todos.js'
+import { parsePublicApi } from './parse'
+import { renderDocs } from './render'
+import { parseTodos, renderTodos } from './todos'
 
 type Config = {
   templatePath: string
