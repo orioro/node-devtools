@@ -9,14 +9,16 @@ import {
 } from './jsdoc'
 import { collectTypeDefsFromSymbol } from './typeCollect'
 
-export function parseSignatureTag(sigStr: string): {
+type ParsedSignature = {
   params: Omit<Param, 'description'>[]
   returnType: string
   typeRefNames: string[]
-} | null {
+}
+
+function tryParseAsFunction(candidate: string): ParsedSignature | null {
   const src = ts.createSourceFile(
     '__sig.ts',
-    `${sigStr} {}`,
+    `${candidate} {}`,
     ts.ScriptTarget.ESNext,
     false,
   )
@@ -54,6 +56,12 @@ export function parseSignatureTag(sigStr: string): {
 
   if (!params) return null
   return { params, returnType, typeRefNames: Array.from(new Set(typeRefNames)) }
+}
+
+export function parseSignatureTag(sigStr: string): ParsedSignature | null {
+  // Try as-is first (expects 'function foo(...)' form)
+  // Fall back to prepending 'function' for short-form ('foo(...): ReturnType')
+  return tryParseAsFunction(sigStr) ?? tryParseAsFunction(`function ${sigStr}`)
 }
 
 export function resolveSymbolsByName(
@@ -108,7 +116,9 @@ export function buildSignatureEntry(
   sourceFileNames: Set<string>,
   program: ts.Program,
 ): RawEntry | null {
-  const parsed = parseSignatureTag(sigTag)
+  // Strip surrounding backticks — users may write @signature `foo(): Bar`
+  const cleanSigTag = sigTag.replace(/^`|`$/g, '').trim()
+  const parsed = parseSignatureTag(cleanSigTag)
   if (!parsed) return null
   const paramDescs = getParamDescriptions(jsDocNode)
   const tags = getJsDocTags(jsDocNode)
@@ -116,7 +126,7 @@ export function buildSignatureEntry(
     entry: {
       name,
       kind: 'function',
-      signature: sigTag,
+      signature: cleanSigTag,
       description: getJsDocDescription(jsDocNode),
       params: parsed.params.map((p) => ({
         ...p,

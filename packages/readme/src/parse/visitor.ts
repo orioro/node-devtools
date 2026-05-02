@@ -74,7 +74,7 @@ export function visitNode(
       }
       const init = decl.initializer
       if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
-        rawEntries.push(extractFromFunctionLike(init, name, checker, filePath))
+        rawEntries.push(extractFromFunctionLike(init, name, checker, filePath, node))
       } else {
         const type = checker.getTypeAtLocation(decl)
         if (type.getCallSignatures().length > 0) {

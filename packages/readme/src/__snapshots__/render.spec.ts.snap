@@ -37,6 +37,8 @@ Multiline signature spanning multiple JSDoc lines.
 function noSignatureTag(): [() => never[], () => string]
 \`\`\`
 
+No signature tag — falls back to normal type inference.
+
 **Returns** \`[() => never[], () => string]\`
 
 ### \`nodeEntry\`
@@ -363,9 +365,11 @@ Fetches a user by id.
 function greet(name: string): string
 \`\`\`
 
+Greets using an arrow function.
+
 **Parameters**
 
-- \`name\` — \`string\`
+- \`name\` — \`string\` - the name to greet
 
 **Returns** \`string\`
 

@@ -105,11 +105,13 @@ export function extractFromFunctionLike(
   name: string,
   checker: ts.TypeChecker,
   filePath: string,
+  jsDocNode?: ts.Node,
 ): RawEntry {
-  const description = getJsDocDescription(node)
-  const tags = getJsDocTags(node)
-  const paramDescs = getParamDescriptions(node)
-  const paramTypes = getParamTypes(node)
+  const docNode = jsDocNode ?? node
+  const description = getJsDocDescription(docNode)
+  const tags = getJsDocTags(docNode)
+  const paramDescs = getParamDescriptions(docNode)
+  const paramTypes = getParamTypes(docNode)
 
   const rawTypes: ts.Type[] = []
 
@@ -140,8 +142,8 @@ export function extractFromFunctionLike(
       returnType: returnTypeStr,
       returnDescription:
         (tags.get('returns') ?? tags.get('return') ?? [])[0] ?? '',
-      examples: getExamples(node),
-      readmeConfig: getReadmeConfig(node),
+      examples: getExamples(docNode),
+      readmeConfig: getReadmeConfig(docNode),
       filePath,
       line: getLine(node),
     },
