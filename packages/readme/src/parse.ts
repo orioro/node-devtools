@@ -312,6 +312,56 @@ function extractConstant(
   }
 }
 
+function extractConstantFn(
+  decl: ts.VariableDeclaration,
+  name: string,
+  type: ts.Type,
+  checker: ts.TypeChecker,
+  filePath: string,
+  jsDocNode: ts.Node,
+): RawEntry {
+  const sig = type.getCallSignatures()[0]
+  const paramDescs = getParamDescriptions(jsDocNode)
+  const paramTypes = getParamTypes(jsDocNode)
+  const tags = getJsDocTags(jsDocNode)
+
+  const rawTypes: ts.Type[] = []
+
+  const params: Param[] = sig.parameters.map((sym) => {
+    const paramName = sym.getName()
+    const paramType = checker.getTypeOfSymbol(sym)
+    rawTypes.push(paramType)
+    return {
+      name: paramName,
+      type: paramTypes.get(paramName) ?? typeToString(checker, paramType),
+      optional: !!(sym.flags & ts.SymbolFlags.Optional),
+      description: paramDescs.get(paramName) ?? '',
+    }
+  })
+
+  const returnType = checker.getReturnTypeOfSignature(sig)
+  rawTypes.push(returnType)
+  const returnTypeStr = typeToString(checker, returnType)
+
+  return {
+    entry: {
+      name,
+      kind: 'function',
+      signature: buildSignature(name, params, returnTypeStr),
+      description: getJsDocDescription(jsDocNode),
+      params,
+      returnType: returnTypeStr,
+      returnDescription:
+        (tags.get('returns') ?? tags.get('return') ?? [])[0] ?? '',
+      examples: getExamples(jsDocNode),
+      readmeConfig: getReadmeConfig(jsDocNode),
+      filePath,
+      line: getLine(decl),
+    },
+    rawTypes,
+  }
+}
+
 function buildSignature(
   name: string,
   params: Param[],
@@ -407,7 +457,13 @@ function visitNode(
         const name = getName(node) ?? decl.name.text
         rawEntries.push(extractFromFunctionLike(init, name, checker, filePath))
       } else {
-        rawEntries.push(extractConstant(decl, checker, filePath, node))
+        const type = checker.getTypeAtLocation(decl)
+        if (type.getCallSignatures().length > 0) {
+          const name = getName(node) ?? decl.name.text
+          rawEntries.push(extractConstantFn(decl, name, type, checker, filePath, node))
+        } else {
+          rawEntries.push(extractConstant(decl, checker, filePath, node))
+        }
       }
     }
     return

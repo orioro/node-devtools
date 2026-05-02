@@ -22,6 +22,23 @@ describe('renderDocs', () => {
     expect(renderDocs(parsePublicApi([fixture('constants')]))).toMatchSnapshot()
   })
 
+  test('renders callable constants as functions with params and return type', () => {
+    expect(
+      renderDocs(parsePublicApi([fixture('callable_constants')])),
+    ).toMatchSnapshot()
+  })
+
+  test('callable constant renders function signature, not const signature', () => {
+    const rendered = renderDocs(parsePublicApi([fixture('callable_constants')]))
+    expect(rendered).toContain('function validate(')
+    expect(rendered).not.toContain('const validate:')
+  })
+
+  test('callable constant renders param table row', () => {
+    const rendered = renderDocs(parsePublicApi([fixture('callable_constants')]))
+    expect(rendered).toContain('value')
+  })
+
   test('renders type definitions section before API for locally-defined types', () => {
     expect(renderDocs(parsePublicApi([fixture('typed')]))).toMatchSnapshot()
   })

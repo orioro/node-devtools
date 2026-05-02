@@ -96,6 +96,41 @@ describe('parsePublicApi', () => {
     })
   })
 
+  describe('callable constants (factory-returned functions)', () => {
+    test('constant with callable interface annotation extracted as function', () => {
+      const { entries } = parsePublicApi([fixture('callable_constants')])
+      const entry = entries.find((e) => e.name === 'validate')!
+      expect(entry).toBeDefined()
+      expect(entry.kind).toBe('function')
+    })
+
+    test('callable constant has correct params from call signature', () => {
+      const { entries } = parsePublicApi([fixture('callable_constants')])
+      const entry = entries.find((e) => e.name === 'validate')!
+      expect(entry.params).toHaveLength(1)
+      expect(entry.params[0].name).toBe('value')
+    })
+
+    test('callable constant has correct return type from call signature', () => {
+      const { entries } = parsePublicApi([fixture('callable_constants')])
+      const entry = entries.find((e) => e.name === 'validate')!
+      expect(entry.returnType).toBe('ValidationResult')
+    })
+
+    test('callable constant signature is function-style not const-style', () => {
+      const { entries } = parsePublicApi([fixture('callable_constants')])
+      const entry = entries.find((e) => e.name === 'validate')!
+      expect(entry.signature).toMatch(/^function validate\(/)
+    })
+
+    test('callable constant JSDoc description and return description are preserved', () => {
+      const { entries } = parsePublicApi([fixture('callable_constants')])
+      const entry = entries.find((e) => e.name === 'validate')!
+      expect(entry.description).toContain('Validates a value')
+      expect(entry.returnDescription).toContain('true when valid')
+    })
+  })
+
   describe('JSDoc type precedence over TypeScript types', () => {
     test('JSDoc @param {type} overrides TS-inferred param type', () => {
       const { entries } = parsePublicApi([fixture('jsdoc_types')])
