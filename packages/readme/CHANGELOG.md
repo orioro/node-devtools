@@ -1,5 +1,11 @@
 # @orioro/readme
 
+## 2.4.0
+
+### Minor Changes
+
+- add support for @signature custom tag oveerride
+
 ## 2.3.3
 
 ### Patch Changes
