@@ -148,6 +148,48 @@ add(1, 2) // 3
 "
 `;
 
+exports[`renderDocs renders callable constants as functions with params and return type 1`] = `
+"## API
+
+
+
+**Functions:** [\`validate\`](#validate)
+
+**Types:** [\`ValidationResult\`](#validationresult)
+
+## Functions
+
+### \`validate\`
+
+[src/__fixtures__/callable_constants.ts#L31](src/__fixtures__/callable_constants.ts#L31)
+
+\`\`\`ts
+function validate(value: unknown): ValidationResult
+\`\`\`
+
+Validates a value. Callable as a function; type validators attached as properties.
+
+**Parameters**
+
+- \`value\` — \`unknown\` - value to validate
+
+**Returns** [\`ValidationResult\`](#validationresult) — true when valid, or an object with message and path
+
+
+## Types
+
+### \`ValidationResult\`
+
+[src/__fixtures__/callable_constants.ts#L1](src/__fixtures__/callable_constants.ts#L1)
+
+\`\`\`ts
+type ValidationResult = true | { message: string; path: string[] }
+\`\`\`
+
+**Used by:** [\`validate\`](#validate)
+"
+`;
+
 exports[`renderDocs renders complex types, arrow functions, and classes 1`] = `
 "## API
 
