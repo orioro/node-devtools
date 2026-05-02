@@ -1,5 +1,11 @@
 # @orioro/readme
 
+## 2.3.3
+
+### Patch Changes
+
+- add support for constants that are actually functions returned by factory fns
+
 ## 2.3.2
 
 ### Patch Changes

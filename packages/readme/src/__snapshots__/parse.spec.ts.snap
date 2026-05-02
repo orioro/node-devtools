@@ -248,7 +248,7 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
       "signature": "function fetchUser(id: string, options?: { timeout?: number | undefined; retries?: number | undefined; } | undefined): Promise<Result<{ id: string; name: string; }>>",
     },
     {
-      "description": "",
+      "description": "Greets using an arrow function.",
       "examples": [],
       "filePath": "omitted",
       "kind": "function",
@@ -256,7 +256,7 @@ exports[`parsePublicApi resolves complex return types and optional params 1`] = 
       "name": "greet",
       "params": [
         {
-          "description": "",
+          "description": "- the name to greet",
           "name": "name",
           "optional": false,
           "type": "string",

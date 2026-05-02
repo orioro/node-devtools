@@ -1,5 +1,137 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`renderDocs @signature tag rendering renders the custom signature string in code block 1`] = `
+"## API
+
+
+
+**Functions:** [\`multiLine\`](#multiline) · [\`noSignatureTag\`](#nosignaturetag) · [\`nodeEntry\`](#nodeentry) · [\`nodeIdArray\`](#nodeidarray) · [\`primitiveOnly\`](#primitiveonly)
+
+**Types:** [\`NodeId\`](#nodeid) · [\`NodeState\`](#nodestate) · [\`__function\`](#function) · [\`__function\`](#function)
+
+## Functions
+
+### \`multiLine\`
+
+[src/__fixtures__/signature_tag.ts#L69](src/__fixtures__/signature_tag.ts#L69)
+
+\`\`\`ts
+function multiLine(state: NodeState, id: NodeId, depth: number): NodeId[]
+\`\`\`
+
+Multiline signature spanning multiple JSDoc lines.
+
+**Parameters**
+
+- \`state\` — [\`NodeState\`](#nodestate) - the tree state
+- \`id\` — [\`NodeId\`](#nodeid) - root node id
+- \`depth\` — \`number\` - max traversal depth
+
+**Returns** [\`NodeId[]\`](#nodeid)
+
+### \`noSignatureTag\`
+
+[src/__fixtures__/signature_tag.ts#L42](src/__fixtures__/signature_tag.ts#L42)
+
+\`\`\`ts
+function noSignatureTag(): [() => never[], () => string]
+\`\`\`
+
+No signature tag — falls back to normal type inference.
+
+**Returns** \`[() => never[], () => string]\`
+
+### \`nodeEntry\`
+
+[src/__fixtures__/signature_tag.ts#L33](src/__fixtures__/signature_tag.ts#L33)
+
+\`\`\`ts
+function nodeEntry(state: NodeState, id: NodeId): unknown
+\`\`\`
+
+Returns a node entry by id.
+
+**Parameters**
+
+- \`state\` — [\`NodeState\`](#nodestate) - the tree state
+- \`id\` — [\`NodeId\`](#nodeid) - the node id
+
+**Returns** \`unknown\` — the node or undefined
+
+### \`nodeIdArray\`
+
+[src/__fixtures__/signature_tag.ts#L19](src/__fixtures__/signature_tag.ts#L19)
+
+\`\`\`ts
+function nodeIdArray(state: NodeState): NodeId[]
+\`\`\`
+
+Returns IDs of all nodes in state.
+
+**Parameters**
+
+- \`state\` — [\`NodeState\`](#nodestate) - the tree state
+
+**Returns** [\`NodeId[]\`](#nodeid) — array of node ids
+
+### \`primitiveOnly\`
+
+[src/__fixtures__/signature_tag.ts#L52](src/__fixtures__/signature_tag.ts#L52)
+
+\`\`\`ts
+function primitiveOnly(count: number, label: string): boolean
+\`\`\`
+
+Signature tag that references no local types.
+
+**Parameters**
+
+- \`count\` — \`number\`
+- \`label\` — \`string\`
+
+**Returns** \`boolean\`
+
+
+## Types
+
+### \`NodeId\`
+
+[src/__fixtures__/signature_tag.ts#L3](src/__fixtures__/signature_tag.ts#L3)
+
+\`\`\`ts
+export type NodeId = string
+\`\`\`
+
+**Used by:** [\`multiLine\`](#multiline), [\`nodeEntry\`](#nodeentry), [\`nodeIdArray\`](#nodeidarray)
+
+### \`NodeState\`
+
+[src/__fixtures__/signature_tag.ts#L1](src/__fixtures__/signature_tag.ts#L1)
+
+\`\`\`ts
+export type NodeState = Record<string, unknown> | unknown[]
+\`\`\`
+
+**Used by:** [\`multiLine\`](#multiline), [\`nodeEntry\`](#nodeentry), [\`nodeIdArray\`](#nodeidarray)
+
+### \`__function\`
+
+[src/__fixtures__/signature_tag.ts#L43](src/__fixtures__/signature_tag.ts#L43)
+
+\`\`\`ts
+;() => []
+\`\`\`
+
+### \`__function\`
+
+[src/__fixtures__/signature_tag.ts#L44](src/__fixtures__/signature_tag.ts#L44)
+
+\`\`\`ts
+;() => 'key'
+\`\`\`
+"
+`;
+
 exports[`renderDocs examples preserves multi-line content within each example block 1`] = `
 "## API
 
@@ -233,9 +365,11 @@ Fetches a user by id.
 function greet(name: string): string
 \`\`\`
 
+Greets using an arrow function.
+
 **Parameters**
 
-- \`name\` — \`string\`
+- \`name\` — \`string\` - the name to greet
 
 **Returns** \`string\`
 

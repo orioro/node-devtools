@@ -131,6 +131,133 @@ describe('parsePublicApi', () => {
     })
   })
 
+  describe('@signature tag', () => {
+    test('uses signature string as entry.signature verbatim', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry).toBeDefined()
+      expect(entry.signature).toBe(
+        'function nodeIdArray(state: NodeState): NodeId[]',
+      )
+    })
+
+    test('kind is function', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry.kind).toBe('function')
+    })
+
+    test('params extracted from signature string', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry.params).toHaveLength(1)
+      expect(entry.params[0].name).toBe('state')
+      expect(entry.params[0].type).toBe('NodeState')
+    })
+
+    test('return type extracted from signature string', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry.returnType).toBe('NodeId[]')
+    })
+
+    test('@param descriptions merged into signature-derived params', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry.params[0].description).toBe('- the tree state')
+    })
+
+    test('multi-param signature parsed correctly', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeEntry')!
+      expect(entry.params).toHaveLength(2)
+      expect(entry.params[0].name).toBe('state')
+      expect(entry.params[1].name).toBe('id')
+      expect(entry.params[1].type).toBe('NodeId')
+      expect(entry.params[1].description).toBe('- the node id')
+    })
+
+    test('local types referenced in signature are collected in result.types', () => {
+      const { types } = parsePublicApi([fixture('signature_tag')])
+      const nodeState = types.find((t) => t.name === 'NodeState')
+      const nodeId = types.find((t) => t.name === 'NodeId')
+      expect(nodeState).toBeDefined()
+      expect(nodeId).toBeDefined()
+    })
+
+    test('entry without @signature falls back to normal inference', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'noSignatureTag')!
+      expect(entry).toBeDefined()
+      expect(entry.signature).not.toContain('NodeState')
+    })
+
+    test('signature with only primitive types collects no local type defs', () => {
+      const { entries, types } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'primitiveOnly')!
+      expect(entry).toBeDefined()
+      expect(entry.params).toHaveLength(2)
+      expect(entry.params[0].type).toBe('number')
+      expect(entry.params[1].type).toBe('string')
+      expect(entry.returnType).toBe('boolean')
+      // no new local types from this entry
+      const newTypes = types.filter((t) =>
+        ['number', 'string', 'boolean'].includes(t.name),
+      )
+      expect(newTypes).toHaveLength(0)
+    })
+
+    describe('multiline @signature', () => {
+      test('parses params from multiline signature', () => {
+        const { entries } = parsePublicApi([fixture('signature_tag')])
+        const entry = entries.find((e) => e.name === 'multiLine')!
+        expect(entry).toBeDefined()
+        expect(entry.params).toHaveLength(3)
+        expect(entry.params[0].name).toBe('state')
+        expect(entry.params[1].name).toBe('id')
+        expect(entry.params[2].name).toBe('depth')
+      })
+
+      test('param types preserved from multiline signature', () => {
+        const { entries } = parsePublicApi([fixture('signature_tag')])
+        const entry = entries.find((e) => e.name === 'multiLine')!
+        expect(entry.params[0].type).toBe('NodeState')
+        expect(entry.params[1].type).toBe('NodeId')
+        expect(entry.params[2].type).toBe('number')
+      })
+
+      test('return type parsed from multiline signature', () => {
+        const { entries } = parsePublicApi([fixture('signature_tag')])
+        const entry = entries.find((e) => e.name === 'multiLine')!
+        expect(entry.returnType).toBe('NodeId[]')
+      })
+
+      test('@param descriptions merged for multiline signature', () => {
+        const { entries } = parsePublicApi([fixture('signature_tag')])
+        const entry = entries.find((e) => e.name === 'multiLine')!
+        expect(entry.params[2].description).toContain('traversal depth')
+      })
+
+      test('local types from multiline signature collected', () => {
+        const { types } = parsePublicApi([fixture('signature_tag')])
+        expect(types.find((t) => t.name === 'NodeState')).toBeDefined()
+        expect(types.find((t) => t.name === 'NodeId')).toBeDefined()
+      })
+    })
+
+    test('returnDescription from @returns tag preserved', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry.returnDescription).toBe('array of node ids')
+    })
+
+    test('description from JSDoc comment preserved', () => {
+      const { entries } = parsePublicApi([fixture('signature_tag')])
+      const entry = entries.find((e) => e.name === 'nodeIdArray')!
+      expect(entry.description).toBe('Returns IDs of all nodes in state.')
+    })
+  })
+
   describe('JSDoc type precedence over TypeScript types', () => {
     test('JSDoc @param {type} overrides TS-inferred param type', () => {
       const { entries } = parsePublicApi([fixture('jsdoc_types')])
