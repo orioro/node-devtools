@@ -376,6 +376,7 @@ function buildSignature(
 type RawEntry = {
   entry: PublicEntry
   rawTypes: ts.Type[]
+  rawSymbols?: ts.Symbol[]
 }
 
 function extractFromFunctionLike(
@@ -427,6 +428,169 @@ function extractFromFunctionLike(
   }
 }
 
+// ---------- Signature tag helpers ----------
+
+function parseSignatureTag(sigStr: string): {
+  params: Omit<Param, 'description'>[]
+  returnType: string
+  typeRefNames: string[]
+} | null {
+  const src = ts.createSourceFile(
+    '__sig.ts',
+    `${sigStr} {}`,
+    ts.ScriptTarget.ESNext,
+    false,
+  )
+
+  let params: Omit<Param, 'description'>[] | null = null
+  let returnType = 'unknown'
+  const typeRefNames: string[] = []
+
+  const collectTypeRefs = (node: ts.Node): void => {
+    if (ts.isTypeReferenceNode(node)) {
+      typeRefNames.push(node.typeName.getText(src).split('.')[0])
+    }
+    ts.forEachChild(node, collectTypeRefs)
+  }
+
+  const walk = (node: ts.Node): void => {
+    if (ts.isFunctionDeclaration(node)) {
+      params = node.parameters.map((p) => ({
+        name: p.name.getText(src),
+        type: p.type ? p.type.getText(src) : 'unknown',
+        optional: !!p.questionToken || p.initializer !== undefined,
+      }))
+      if (node.type) {
+        returnType = node.type.getText(src)
+        collectTypeRefs(node.type)
+      }
+      for (const p of node.parameters) {
+        if (p.type) collectTypeRefs(p.type)
+      }
+      return
+    }
+    ts.forEachChild(node, walk)
+  }
+  walk(src)
+
+  if (!params) return null
+  return { params, returnType, typeRefNames: Array.from(new Set(typeRefNames)) }
+}
+
+function resolveSymbolsByName(
+  names: string[],
+  checker: ts.TypeChecker,
+  sourceFileNames: Set<string>,
+  program: ts.Program,
+): ts.Symbol[] {
+  const symbols: ts.Symbol[] = []
+  for (const name of names) {
+    let resolved = false
+    for (const sf of program.getSourceFiles()) {
+      if (!sourceFileNames.has(sf.fileName) || resolved) continue
+      const findInNode = (node: ts.Node): void => {
+        if (resolved) return
+        if (
+          (ts.isTypeAliasDeclaration(node) ||
+            ts.isInterfaceDeclaration(node) ||
+            ts.isEnumDeclaration(node)) &&
+          node.name.text === name
+        ) {
+          const sym = checker.getSymbolAtLocation(node.name)
+          if (sym) {
+            symbols.push(sym)
+            resolved = true
+          }
+          return
+        }
+        if (ts.isClassDeclaration(node) && node.name?.text === name) {
+          const sym = checker.getSymbolAtLocation(node.name)
+          if (sym) {
+            symbols.push(sym)
+            resolved = true
+          }
+          return
+        }
+        ts.forEachChild(node, findInNode)
+      }
+      findInNode(sf)
+    }
+  }
+  return symbols
+}
+
+function collectTypeDefsFromSymbol(
+  symbol: ts.Symbol,
+  checker: ts.TypeChecker,
+  sourceFileNames: Set<string>,
+  seen: Set<ts.Symbol>,
+  result: TypeDefinition[],
+  visitedTypes: Set<ts.Type>,
+) {
+  if (seen.has(symbol)) return
+  seen.add(symbol)
+
+  const name = symbol.getName()
+  if (name === '__type' || name === '__object') return
+  if (symbol.flags & ts.SymbolFlags.TypeParameter) return
+
+  const localDecl = (symbol.declarations ?? []).find((d) =>
+    sourceFileNames.has(d.getSourceFile().fileName),
+  )
+  if (!localDecl) return
+
+  walkTypeRefs(localDecl, checker, sourceFileNames, seen, result, visitedTypes)
+  result.push({
+    name,
+    text: localDecl.getText().trim(),
+    references: getDirectTypeRefNames(localDecl, checker, sourceFileNames),
+    filePath: localDecl.getSourceFile().fileName,
+    line: getLine(localDecl),
+  })
+}
+
+function buildSignatureEntry(
+  name: string,
+  sigTag: string,
+  jsDocNode: ts.Node,
+  filePath: string,
+  line: number,
+  checker: ts.TypeChecker,
+  sourceFileNames: Set<string>,
+  program: ts.Program,
+): RawEntry | null {
+  const parsed = parseSignatureTag(sigTag)
+  if (!parsed) return null
+  const paramDescs = getParamDescriptions(jsDocNode)
+  const tags = getJsDocTags(jsDocNode)
+  return {
+    entry: {
+      name,
+      kind: 'function',
+      signature: sigTag,
+      description: getJsDocDescription(jsDocNode),
+      params: parsed.params.map((p) => ({
+        ...p,
+        description: paramDescs.get(p.name) ?? '',
+      })),
+      returnType: parsed.returnType,
+      returnDescription:
+        (tags.get('returns') ?? tags.get('return') ?? [])[0] ?? '',
+      examples: getExamples(jsDocNode),
+      readmeConfig: getReadmeConfig(jsDocNode),
+      filePath,
+      line,
+    },
+    rawTypes: [],
+    rawSymbols: resolveSymbolsByName(
+      parsed.typeRefNames,
+      checker,
+      sourceFileNames,
+      program,
+    ),
+  }
+}
+
 // ---------- AST visitor ----------
 
 function visitNode(
@@ -434,15 +598,34 @@ function visitNode(
   checker: ts.TypeChecker,
   filePath: string,
   rawEntries: RawEntry[],
+  program: ts.Program,
+  sourceFileNames: Set<string>,
 ) {
   if (!hasPublicTag(node)) {
     ts.forEachChild(node, (child) =>
-      visitNode(child, checker, filePath, rawEntries),
+      visitNode(child, checker, filePath, rawEntries, program, sourceFileNames),
     )
     return
   }
 
   if (ts.isFunctionDeclaration(node) && node.name) {
+    const sigTag = getJsDocTags(node).get('signature')?.[0]
+    if (sigTag) {
+      const sigEntry = buildSignatureEntry(
+        getName(node)!,
+        sigTag,
+        node,
+        filePath,
+        getLine(node),
+        checker,
+        sourceFileNames,
+        program,
+      )
+      if (sigEntry) {
+        rawEntries.push(sigEntry)
+        return
+      }
+    }
     rawEntries.push(
       extractFromFunctionLike(node, getName(node)!, checker, filePath),
     )
@@ -452,14 +635,30 @@ function visitNode(
   if (ts.isVariableStatement(node)) {
     for (const decl of node.declarationList.declarations) {
       if (!ts.isIdentifier(decl.name)) continue
+      const name = getName(node) ?? decl.name.text
+      const sigTag = getJsDocTags(node).get('signature')?.[0]
+      if (sigTag) {
+        const sigEntry = buildSignatureEntry(
+          name,
+          sigTag,
+          node,
+          filePath,
+          getLine(decl),
+          checker,
+          sourceFileNames,
+          program,
+        )
+        if (sigEntry) {
+          rawEntries.push(sigEntry)
+          continue
+        }
+      }
       const init = decl.initializer
       if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
-        const name = getName(node) ?? decl.name.text
         rawEntries.push(extractFromFunctionLike(init, name, checker, filePath))
       } else {
         const type = checker.getTypeAtLocation(decl)
         if (type.getCallSignatures().length > 0) {
-          const name = getName(node) ?? decl.name.text
           rawEntries.push(extractConstantFn(decl, name, type, checker, filePath, node))
         } else {
           rawEntries.push(extractConstant(decl, checker, filePath, node))
@@ -540,7 +739,7 @@ export function parsePublicApi(
     const sourceFile = program.getSourceFile(filePath)
     if (!sourceFile) continue
     ts.forEachChild(sourceFile, (node) =>
-      visitNode(node, checker, filePath, rawEntries),
+      visitNode(node, checker, filePath, rawEntries, program, sourceFileNames),
     )
   }
 
@@ -549,9 +748,12 @@ export function parsePublicApi(
   const visitedTypes = new Set<ts.Type>()
   const types: TypeDefinition[] = []
 
-  for (const { rawTypes } of rawEntries) {
+  for (const { rawTypes, rawSymbols } of rawEntries) {
     for (const type of rawTypes) {
       collectTypeDefs(type, checker, sourceFileNames, seen, types, visitedTypes)
+    }
+    for (const symbol of rawSymbols ?? []) {
+      collectTypeDefsFromSymbol(symbol, checker, sourceFileNames, seen, types, visitedTypes)
     }
   }
 

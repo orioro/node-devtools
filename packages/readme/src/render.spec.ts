@@ -62,7 +62,10 @@ describe('renderDocs', () => {
 
     test('renders section sub-headings within each category', () => {
       const rendered = renderDocs(parsePublicApi([fixture('categories')]))
-      const authSection = rendered.slice(rendered.indexOf('## Auth'), rendered.indexOf('## Utility'))
+      const authSection = rendered.slice(
+        rendered.indexOf('## Auth'),
+        rendered.indexOf('## Utility'),
+      )
       expect(authSection).toContain('### Functions')
       expect(authSection).toContain('### Components')
     })
@@ -76,8 +79,13 @@ describe('renderDocs', () => {
 
     test('custom kind=Components groups entry under Components section', () => {
       const rendered = renderDocs(parsePublicApi([fixture('categories')]))
-      const authSection = rendered.slice(rendered.indexOf('## Auth'), rendered.indexOf('## Utility'))
-      const componentsSection = authSection.slice(authSection.indexOf('### Components'))
+      const authSection = rendered.slice(
+        rendered.indexOf('## Auth'),
+        rendered.indexOf('## Utility'),
+      )
+      const componentsSection = authSection.slice(
+        authSection.indexOf('### Components'),
+      )
       expect(componentsSection).toContain('#### `Button`')
     })
 
@@ -124,6 +132,38 @@ describe('renderDocs', () => {
       const rendered = renderDocs(parsePublicApi([fixture('ordering')]))
       const names = getOrder(rendered)
       expect(names.indexOf('alpha')).toBeLessThan(names.indexOf('zebra'))
+    })
+  })
+
+  describe('@signature tag rendering', () => {
+    test('renders the custom signature string in code block', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('signature_tag')]))
+      expect(rendered).toMatchSnapshot()
+      expect(rendered).toContain(
+        'function nodeIdArray(state: NodeState): NodeId[]',
+      )
+    })
+
+    test('renders param table rows from signature-parsed params', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('signature_tag')]))
+      expect(rendered).toContain('state')
+      expect(rendered).toContain('NodeState')
+    })
+
+    test('renders param descriptions from @param tags', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('signature_tag')]))
+      expect(rendered).toContain('tree state')
+    })
+
+    test('renders type definitions for types referenced in signature', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('signature_tag')]))
+      expect(rendered).toContain('NodeState')
+      expect(rendered).toContain('NodeId')
+    })
+
+    test('does not render the wrapper type (QueryProvider) in output', () => {
+      const rendered = renderDocs(parsePublicApi([fixture('signature_tag')]))
+      expect(rendered).not.toContain('QueryProvider')
     })
   })
 
